@@ -1,0 +1,112 @@
+---
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title = 'Оставить заявку', class: className = '' } = Astro.props;
+---
+
+<div class:list={['bg-neutral-50 rounded-2xl p-8 lg:p-12', className]}>
+  <h3 class="text-2xl font-bold text-neutral-900 mb-2">{title}</h3>
+  <p class="text-neutral-600 mb-8">Заполните форму — мы свяжемся с вами в рабочее время</p>
+
+  <form class="full-request-form grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium text-neutral-700 mb-1">Имя *</label>
+      <input
+        type="text"
+        name="name"
+        required
+        placeholder="Ваше имя"
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-neutral-700 mb-1">Телефон *</label>
+      <input
+        type="tel"
+        name="phone"
+        required
+        placeholder="+7 (___) ___-__-__"
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-neutral-700 mb-1">Email</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="email@example.com"
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-neutral-700 mb-1">Тип бизнеса</label>
+      <select
+        name="businessType"
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors bg-white"
+      >
+        <option value="">Выберите тип</option>
+        <option value="magazin">Магазин</option>
+        <option value="kafe">Кафе / Ресторан</option>
+        <option value="salon">Салон красоты</option>
+        <option value="apteka">Аптека</option>
+        <option value="pivnoy">Пивной магазин</option>
+        <option value="kofeynya">Кофейня</option>
+        <option value="pekarnya">Пекарня</option>
+        <option value="other">Другой</option>
+      </select>
+    </div>
+    <div class="sm:col-span-2">
+      <label class="block text-sm font-medium text-neutral-700 mb-1">Сообщение</label>
+      <textarea
+        name="message"
+        rows="3"
+        placeholder="Опишите вашу задачу..."
+        class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors resize-none"
+      ></textarea>
+    </div>
+    <div class="sm:col-span-2">
+      <button
+        type="submit"
+        class="w-full sm:w-auto bg-primary-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+      >
+        Отправить заявку
+      </button>
+      <p class="text-xs text-neutral-500 mt-3">
+        Нажимая кнопку, вы соглашаетесь с <a href="/politika-konfidentsialnosti" class="underline hover:text-primary-600">политикой конфиденциальности</a>
+      </p>
+    </div>
+  </form>
+
+  <div class="full-request-success hidden text-center py-8">
+    <div class="text-4xl mb-4">✓</div>
+    <h4 class="text-lg font-bold text-neutral-900 mb-2">Заявка отправлена!</h4>
+    <p class="text-neutral-600">Мы свяжемся с вами в ближайшее время</p>
+  </div>
+</div>
+
+<script is:inline>
+  document.querySelectorAll('.full-request-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formData = new FormData(form);
+      var data = Object.fromEntries(formData);
+      var parent = form.parentElement;
+
+      fetch('/api/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(function() {});
+
+      if (typeof ym !== 'undefined' && window.__METRIKA_ID) {
+        ym(window.__METRIKA_ID, 'reachGoal', 'full_request');
+      }
+
+      form.classList.add('hidden');
+      parent.querySelector('.full-request-success').classList.remove('hidden');
+    });
+  });
+</script>

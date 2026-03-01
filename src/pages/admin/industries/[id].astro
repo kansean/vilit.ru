@@ -1,0 +1,163 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { industriesRepo } from '../../../lib/industries.repo';
+import { safeJsonParse } from '../../../lib/safe-json';
+
+const { id } = Astro.params;
+const isNew = id === 'new';
+const item = isNew ? null : industriesRepo.getById(id!);
+
+if (!isNew && !item) {
+  return Astro.redirect('/admin/industries');
+}
+
+const title = isNew ? 'Новая отрасль' : `Редактирование: ${item!.title}`;
+
+const formData = isNew ? {
+  id: '', title: '', description: '', meta_title: '', meta_description: '',
+  icon: '', hero_title: '', hero_subtitle: '', sort_order: 0,
+  pain_points: [] as string[], legal_requirements: [] as string[], equipment_list: [] as string[],
+  faq: [] as {question:string;answer:string}[], related_services: [] as string[], content: ''
+} : {
+  ...item,
+  pain_points: safeJsonParse<string[]>(item!.pain_points, []),
+  legal_requirements: safeJsonParse<string[]>(item!.legal_requirements, []),
+  equipment_list: safeJsonParse<string[]>(item!.equipment_list, []),
+  faq: safeJsonParse<{question:string;answer:string}[]>(item!.faq, []),
+  related_services: safeJsonParse<string[]>(item!.related_services, []),
+};
+---
+
+<AdminLayout title={title}>
+  <div x-data={`industryForm(${JSON.stringify(formData)})`}>
+
+    <div class="flex-between">
+      <a href="/admin/industries" class="btn btn-secondary btn-sm">← Назад</a>
+      <div class="actions">
+        {!isNew && <button class="btn btn-danger btn-sm" @click="deleteItem()">Удалить</button>}
+        <button class="btn btn-primary" @click="save()" :disabled="saving">
+          <span x-show="!saving">Сохранить</span>
+          <span x-show="saving">Сохранение...</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid-2 mt-4">
+      <div>
+        <div class="card">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Основное</h3>
+          {isNew && (
+            <div class="form-group">
+              <label>Slug (id)</label>
+              <input type="text" x-model="form.id" placeholder="kafe" />
+              <div class="help">Латиница, дефисы. URL: /dlya-biznesa/slug</div>
+            </div>
+          )}
+          <div class="form-group"><label>Название</label><input type="text" x-model="form.title" /></div>
+          <div class="form-group"><label>Описание</label><textarea x-model="form.description" rows="2"></textarea></div>
+          <div class="form-group"><label>Иконка (emoji)</label><input type="text" x-model="form.icon" /></div>
+          <div class="form-group"><label>Порядок</label><input type="number" x-model.number="form.sort_order" /></div>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">SEO</h3>
+          <div class="form-group"><label>Meta Title</label><input type="text" x-model="form.meta_title" /></div>
+          <div class="form-group"><label>Meta Description</label><textarea x-model="form.meta_description" rows="2"></textarea></div>
+          <div class="form-group"><label>Hero Title</label><input type="text" x-model="form.hero_title" /></div>
+          <div class="form-group"><label>Hero Subtitle</label><textarea x-model="form.hero_subtitle" rows="2"></textarea></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Проблемы (Pain Points)</h3>
+          <template x-for="(f, i) in form.pain_points" :key="i">
+            <div class="array-item"><input type="text" x-model="form.pain_points[i]" /><button @click="form.pain_points.splice(i, 1)">×</button></div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.pain_points.push('')">+ Добавить</button>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Требования по закону</h3>
+          <template x-for="(f, i) in form.legal_requirements" :key="i">
+            <div class="array-item"><input type="text" x-model="form.legal_requirements[i]" /><button @click="form.legal_requirements.splice(i, 1)">×</button></div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.legal_requirements.push('')">+ Добавить</button>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Оборудование</h3>
+          <template x-for="(f, i) in form.equipment_list" :key="i">
+            <div class="array-item"><input type="text" x-model="form.equipment_list[i]" /><button @click="form.equipment_list.splice(i, 1)">×</button></div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.equipment_list.push('')">+ Добавить</button>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">FAQ</h3>
+          <template x-for="(f, i) in form.faq" :key="i">
+            <div class="faq-item">
+              <input type="text" x-model="form.faq[i].question" placeholder="Вопрос" />
+              <textarea x-model="form.faq[i].answer" rows="2" placeholder="Ответ"></textarea>
+              <button class="btn btn-danger btn-sm" @click="form.faq.splice(i, 1)">Удалить</button>
+            </div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.faq.push({question:'',answer:''})">+ Добавить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Контент (Markdown)</h3>
+      <textarea x-model="form.content" rows="15" style="width:100%;font-family:monospace;font-size:0.8125rem;padding:0.625rem;border:1px solid #d1d5db;border-radius:0.5rem;"></textarea>
+    </div>
+
+    <div class="card mt-4">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Связи</h3>
+      <div class="form-group">
+        <label>Связанные услуги (slug через запятую)</label>
+        <input type="text" :value="form.related_services.join(', ')"
+          @change="form.related_services = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)" />
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem; text-align: right;">
+      <button class="btn btn-primary" @click="save()" :disabled="saving">Сохранить</button>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ isNew, itemId: isNew ? '' : id }}>
+    function industryForm(initial) {
+      return {
+        form: initial,
+        saving: false,
+        async save() {
+          this.saving = true;
+          try {
+            const body = {
+              ...this.form,
+              pain_points: JSON.stringify(this.form.pain_points.filter(Boolean)),
+              legal_requirements: JSON.stringify(this.form.legal_requirements.filter(Boolean)),
+              equipment_list: JSON.stringify(this.form.equipment_list.filter(Boolean)),
+              faq: JSON.stringify(this.form.faq.filter(f => f.question)),
+              related_services: JSON.stringify(this.form.related_services),
+            };
+            const url = isNew ? '/api/v1/industries' : `/api/v1/industries/${itemId}`;
+            const method = isNew ? 'POST' : 'PUT';
+            const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (res.ok) {
+              if (isNew) { const data = await res.json(); window.location.href = `/admin/industries/${data.item.id}`; }
+              else { alert('Сохранено!'); }
+            } else { const err = await res.json(); alert('Ошибка: ' + (err.error || 'Неизвестная ошибка')); }
+          } catch { alert('Ошибка сети'); } finally { this.saving = false; }
+        },
+        async deleteItem() {
+          if (!confirm('Удалить отрасль?')) return;
+          const res = await fetch(`/api/v1/industries/${itemId}`, { method: 'DELETE' });
+          if (res.ok) window.location.href = '/admin/industries';
+          else alert('Ошибка удаления');
+        },
+      };
+    }
+  </script>
+</AdminLayout>

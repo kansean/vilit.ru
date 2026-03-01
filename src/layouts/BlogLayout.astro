@@ -1,0 +1,76 @@
+---
+import PageLayout from './PageLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import InlineLeadForm from '../components/forms/InlineLeadForm.astro';
+import JsonLdArticle from '../components/seo/JsonLdArticle.astro';
+import { buildBreadcrumbs } from '../utils/breadcrumbs';
+import { formatDate } from '../utils/formatters';
+
+interface Props {
+  title: string;
+  description: string;
+  metaTitle: string;
+  metaDescription: string;
+  publishDate: Date;
+  updatedDate?: Date;
+  author?: string;
+  tags?: string[];
+  slug: string;
+  contentHtml?: string;
+}
+
+const {
+  title, description, metaTitle, metaDescription,
+  publishDate, updatedDate, author, tags, slug, contentHtml,
+} = Astro.props;
+
+const breadcrumbs = buildBreadcrumbs(`/blog/${slug}`, title);
+---
+
+<PageLayout title={metaTitle} description={metaDescription} type="article">
+  <JsonLdArticle
+    title={title}
+    description={description}
+    url={`/blog/${slug}`}
+    publishDate={publishDate}
+    updatedDate={updatedDate}
+    author={author}
+  />
+
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-12 lg:py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <div class="max-w-3xl">
+          {tags && tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mb-4">
+              {tags.map((tag) => (
+                <span class="bg-white/10 text-primary-200 px-3 py-1 rounded-full text-xs font-medium">{tag}</span>
+              ))}
+            </div>
+          )}
+          <h1 class="text-3xl sm:text-4xl font-bold mb-4">{title}</h1>
+          <div class="flex items-center gap-4 text-primary-200 text-sm">
+            <time datetime={publishDate.toISOString()}>{formatDate(publishDate)}</time>
+            {author && <span>· {author}</span>}
+          </div>
+        </div>
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        <article class="max-w-3xl prose">
+          {contentHtml ? <Fragment set:html={contentHtml} /> : <slot />}
+        </article>
+      </Container>
+    </section>
+
+    <section class="py-12">
+      <Container>
+        <InlineLeadForm title="Остались вопросы? Получите консультацию" />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

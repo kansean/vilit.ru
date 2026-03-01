@@ -1,0 +1,36 @@
+---
+import { company } from '../../data/company';
+
+interface Props {
+  name: string;
+  description: string;
+  url: string;
+  image?: string;
+  price: number;
+  brand: string;
+  inStock?: boolean;
+}
+
+const { name, description, url, image, price, brand, inStock = true } = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name,
+  description,
+  url: `${company.site}${url}`,
+  ...(image ? { image: `${company.site}${image}` } : {}),
+  brand: { '@type': 'Brand', name: brand },
+  offers: {
+    '@type': 'Offer',
+    price: price.toString(),
+    priceCurrency: 'RUB',
+    availability: inStock
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock',
+    seller: { '@type': 'Organization', name: company.name },
+  },
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

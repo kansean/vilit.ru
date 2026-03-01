@@ -1,0 +1,32 @@
+---
+import { company } from '../../data/company';
+
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+  publishDate: Date;
+  updatedDate?: Date;
+  author?: string;
+}
+
+const { title, description, url, publishDate, updatedDate, author = company.name } = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  url: `${company.site}${url}`,
+  datePublished: publishDate.toISOString(),
+  ...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
+  author: { '@type': 'Organization', name: author },
+  publisher: {
+    '@type': 'Organization',
+    name: company.name,
+    url: company.site,
+  },
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

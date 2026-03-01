@@ -1,0 +1,70 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import EquipmentCard from '../../components/ui/EquipmentCard.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import InlineLeadForm from '../../components/forms/InlineLeadForm.astro';
+import { buildBreadcrumbs } from '../../utils/breadcrumbs';
+import { equipmentRepo } from '../../lib/equipment.repo';
+
+const allEquipment = equipmentRepo.list();
+const breadcrumbs = buildBreadcrumbs('/oborudovanie', 'Оборудование');
+
+const categories = [
+  { slug: 'skanery', label: 'Сканеры штрихкодов' },
+  { slug: 'printery-chekov', label: 'Принтеры чеков' },
+  { slug: 'printery-etiketok', label: 'Принтеры этикеток' },
+  { slug: 'tsd', label: 'Терминалы сбора данных (ТСД)' },
+  { slug: 'kassy', label: 'Кассы' },
+];
+---
+
+<PageLayout title="Торговое оборудование" description="Сканеры, принтеры чеков, принтеры этикеток, ТСД и кассы для розничной торговли. Каталог оборудования от ведущих производителей.">
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="text-3xl sm:text-4xl font-bold mb-4">Торговое оборудование</h1>
+        <p class="text-lg text-primary-100 max-w-2xl">
+          Сканеры, принтеры, ТСД и кассы от ведущих производителей с гарантией и настройкой
+        </p>
+      </Container>
+    </section>
+
+    {categories.map((cat) => {
+      const items = allEquipment.filter((e) => e.category === cat.slug);
+      if (items.length === 0) return null;
+      return (
+        <section class="section" id={cat.slug}>
+          <Container>
+            <div class="flex items-center justify-between mb-8">
+              <h2 class="text-2xl font-bold text-neutral-900">{cat.label}</h2>
+              <a href={`/oborudovanie/${cat.slug}`} class="text-primary-600 font-medium text-sm hover:text-primary-700">
+                Все {cat.label.toLowerCase()} →
+              </a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {items.slice(0, 4).map((item) => (
+                <EquipmentCard
+                  title={item.title}
+                  brand={item.brand}
+                  price={item.price}
+                  oldPrice={item.old_price || undefined}
+                  href={`/oborudovanie/${item.category}/${item.id}`}
+                  image={item.image || undefined}
+                  inStock={!!item.in_stock}
+                />
+              ))}
+            </div>
+          </Container>
+        </section>
+      );
+    })}
+
+    <section class="py-16">
+      <Container>
+        <InlineLeadForm title="Нужна помощь с выбором оборудования?" />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

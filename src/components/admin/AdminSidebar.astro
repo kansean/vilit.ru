@@ -1,0 +1,35 @@
+---
+const currentPath = Astro.url.pathname;
+
+const nav = [
+  { label: 'Dashboard', href: '/admin', icon: '📊' },
+  { section: 'Контент' },
+  { label: 'Услуги', href: '/admin/services', icon: '🔧' },
+  { label: 'Отрасли', href: '/admin/industries', icon: '🏭' },
+  { label: 'Оборудование', href: '/admin/equipment', icon: '📦' },
+  { label: 'Блог', href: '/admin/blog', icon: '📝' },
+  { section: 'Управление' },
+  { label: 'Заявки', href: '/admin/leads', icon: '📋' },
+  { label: 'Настройки', href: '/admin/settings', icon: '⚙️' },
+];
+---
+
+<aside class="sidebar">
+  <div class="logo">
+    <a href="/admin" style="text-decoration:none;color:inherit;">Вилит — Админка</a>
+  </div>
+  <nav style="padding-top: 0.75rem;">
+    {nav.map((item) => {
+      if ('section' in item) {
+        return <div class="section-label">{item.section}</div>;
+      }
+      const isActive = currentPath === item.href || (item.href !== '/admin' && currentPath.startsWith(item.href!));
+      return (
+        <a href={item.href} class={isActive ? 'active' : ''}>
+          <span>{item.icon}</span>
+          <span>{item.label}</span>
+        </a>
+      );
+    })}
+  </nav>
+</aside>

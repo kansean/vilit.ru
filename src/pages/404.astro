@@ -1,0 +1,23 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Button from '../components/ui/Button.astro';
+---
+
+<PageLayout title="Страница не найдена" description="Запрашиваемая страница не найдена" noindex>
+  <main class="section">
+    <Container>
+      <div class="text-center py-16">
+        <div class="text-8xl font-bold text-primary-100 mb-4">404</div>
+        <h1 class="text-2xl font-bold text-neutral-900 mb-4">Страница не найдена</h1>
+        <p class="text-neutral-600 mb-8 max-w-md mx-auto">
+          Возможно, страница была удалена или адрес введён неверно. Попробуйте начать с главной.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button variant="primary" href="/">На главную</Button>
+          <Button variant="outline" href="/kontakty">Связаться с нами</Button>
+        </div>
+      </div>
+    </Container>
+  </main>
+</PageLayout>

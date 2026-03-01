@@ -1,0 +1,32 @@
+---
+import { company } from '../../data/company';
+
+interface Props {
+  name: string;
+  description: string;
+  url: string;
+  price?: string;
+}
+
+const { name, description, url, price } = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name,
+  description,
+  url: `${company.site}${url}`,
+  provider: {
+    '@type': 'Organization',
+    name: company.name,
+    url: company.site,
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Россия',
+  },
+  ...(price ? { offers: { '@type': 'Offer', price, priceCurrency: 'RUB' } } : {}),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

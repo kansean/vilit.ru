@@ -1,0 +1,138 @@
+---
+import Container from '../ui/Container.astro';
+
+const services = [
+  { id: 'kkt', label: 'Онлайн-касса (ККТ)', price: 12900 },
+  { id: 'fn', label: 'Фискальный накопитель (ФН)', price: 7500 },
+  { id: 'ofd', label: 'ОФД (на 1 год)', price: 3000 },
+  { id: 'reg', label: 'Регистрация в ФНС', price: 1000 },
+  { id: 'ecp', label: 'ЭЦП', price: 1500 },
+  { id: 'rutoken', label: 'Рутокен', price: 1500 },
+  { id: 'egais', label: 'Подключение ЕГАИС', price: 7000 },
+  { id: 'markirovka', label: 'Подключение маркировки', price: 5000 },
+  { id: 'skaner', label: 'Сканер штрихкодов', price: 3990 },
+  { id: 'printer', label: 'Принтер чеков', price: 8900 },
+];
+---
+
+<section class="section bg-primary-50" id="calculator">
+  <Container>
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-bold text-neutral-900 mb-4">Калькулятор стоимости</h2>
+      <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+        Выберите нужные услуги и оборудование — рассчитаем примерную стоимость
+      </p>
+    </div>
+
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 lg:p-8">
+      <div class="space-y-3 mb-8">
+        {services.map((service) => (
+          <label class="flex items-center justify-between p-3 rounded-xl hover:bg-neutral-50 cursor-pointer transition-colors group">
+            <div class="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="service"
+                value={service.id}
+                data-price={service.price}
+                class="calc-checkbox w-5 h-5 text-primary-600 rounded border-neutral-300 focus:ring-primary-500"
+              />
+              <span class="text-neutral-800 group-hover:text-neutral-900">{service.label}</span>
+            </div>
+            <span class="text-sm text-neutral-500 font-medium">от {service.price.toLocaleString('ru-RU')} ₽</span>
+          </label>
+        ))}
+      </div>
+
+      <div class="border-t border-neutral-200 pt-6">
+        <div class="flex items-center justify-between mb-6">
+          <span class="text-lg font-semibold text-neutral-900">Итого:</span>
+          <span class="text-2xl font-bold text-primary-600" id="calc-total">0 ₽</span>
+        </div>
+
+        <form id="calc-form" class="space-y-4">
+          <input type="hidden" name="services" id="calc-services-input" />
+          <input type="hidden" name="total" id="calc-total-input" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              type="text"
+              name="name"
+              required
+              placeholder="Ваше имя"
+              class="px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+            />
+            <input
+              type="tel"
+              name="phone"
+              required
+              placeholder="+7 (___) ___-__-__"
+              class="px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-primary-600 text-white font-semibold py-3 rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+          >
+            Получить точный расчёт
+          </button>
+          <p class="text-xs text-neutral-500 text-center">
+            Нажимая кнопку, вы соглашаетесь с <a href="/politika-konfidentsialnosti" class="underline hover:text-primary-600">политикой конфиденциальности</a>
+          </p>
+        </form>
+
+        <div id="calc-success" class="hidden text-center py-8">
+          <div class="text-4xl mb-4">✓</div>
+          <h4 class="text-lg font-bold text-neutral-900 mb-2">Заявка отправлена!</h4>
+          <p class="text-neutral-600">Мы свяжемся с вами для уточнения деталей</p>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>
+
+<script is:inline>
+  (function() {
+    var checkboxes = document.querySelectorAll('.calc-checkbox');
+    var totalEl = document.getElementById('calc-total');
+    var form = document.getElementById('calc-form');
+    var success = document.getElementById('calc-success');
+    var servicesInput = document.getElementById('calc-services-input');
+    var totalInput = document.getElementById('calc-total-input');
+
+    function updateTotal() {
+      var total = 0;
+      var selected = [];
+      checkboxes.forEach(function(cb) {
+        if (cb.checked) {
+          total += parseInt(cb.dataset.price, 10);
+          selected.push(cb.value);
+        }
+      });
+      totalEl.textContent = total > 0 ? 'от ' + total.toLocaleString('ru-RU') + ' ₽' : '0 ₽';
+      servicesInput.value = selected.join(',');
+      totalInput.value = total.toString();
+    }
+
+    checkboxes.forEach(function(cb) {
+      cb.addEventListener('change', updateTotal);
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formData = new FormData(form);
+      var data = Object.fromEntries(formData);
+
+      fetch('/api/calculator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(function() {});
+
+      if (typeof ym !== 'undefined' && window.__METRIKA_ID) {
+        ym(window.__METRIKA_ID, 'reachGoal', 'calculator_form');
+      }
+
+      form.classList.add('hidden');
+      success.classList.remove('hidden');
+    });
+  })();
+</script>

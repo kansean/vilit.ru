@@ -1,0 +1,56 @@
+---
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title = 'Получите консультацию', class: className = '' } = Astro.props;
+---
+
+<div class:list={['bg-primary-600 rounded-2xl p-8 text-white', className]}>
+  <h3 class="text-xl font-bold mb-2">{title}</h3>
+  <p class="text-primary-100 text-sm mb-6">Оставьте телефон — подберём решение для вашего бизнеса</p>
+  <form class="inline-lead-form flex flex-col sm:flex-row gap-3">
+    <input
+      type="tel"
+      name="phone"
+      required
+      placeholder="+7 (___) ___-__-__"
+      class="flex-1 px-4 py-3 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-white outline-none"
+    />
+    <button
+      type="submit"
+      class="bg-accent-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-accent-600 transition-colors shrink-0"
+    >
+      Перезвоните мне
+    </button>
+  </form>
+  <p class="text-xs text-primary-200 mt-3">
+    Нажимая кнопку, вы соглашаетесь с <a href="/politika-konfidentsialnosti" class="underline hover:text-white">политикой конфиденциальности</a>
+  </p>
+</div>
+
+<script is:inline>
+  document.querySelectorAll('.inline-lead-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formData = new FormData(form);
+      var data = Object.fromEntries(formData);
+
+      fetch('/api/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(function() {});
+
+      if (typeof ym !== 'undefined' && window.__METRIKA_ID) {
+        ym(window.__METRIKA_ID, 'reachGoal', 'inline_lead');
+      }
+
+      var btn = form.querySelector('button[type="submit"]');
+      btn.textContent = 'Спасибо! Перезвоним';
+      btn.disabled = true;
+      btn.classList.add('opacity-75');
+    });
+  });
+</script>

@@ -1,0 +1,41 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { blogRepo } from '../../../lib/blog.repo';
+
+const posts = blogRepo.list();
+---
+
+<AdminLayout title="Блог">
+  <div class="flex-between">
+    <p class="text-muted">{posts.length} статей</p>
+    <a href="/admin/blog/new" class="btn btn-primary">+ Создать</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Название</th>
+        <th>Slug</th>
+        <th>Автор</th>
+        <th>Дата</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {posts.map((p) => (
+        <tr>
+          <td><strong>{p.title}</strong></td>
+          <td class="text-sm">{p.id}</td>
+          <td class="text-sm">{p.author}</td>
+          <td class="text-sm text-muted">{p.publish_date}</td>
+          <td>
+            <div class="actions">
+              <a href={`/admin/blog/${p.id}`} class="btn btn-secondary btn-sm">Редактировать</a>
+              <a href={`/blog/${p.id}`} class="btn btn-secondary btn-sm" target="_blank">Просмотр</a>
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AdminLayout>

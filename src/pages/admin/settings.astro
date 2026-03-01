@@ -1,0 +1,97 @@
+---
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+import { settingsRepo } from '../../lib/settings.repo';
+
+const settings = settingsRepo.getAll();
+---
+
+<AdminLayout title="Настройки">
+  <div x-data={`settingsForm(${JSON.stringify(settings)})`}>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Компания</h3>
+        <div class="form-group"><label>Название</label><input type="text" x-model="form.company_name" /></div>
+        <div class="form-group"><label>Юр. название</label><input type="text" x-model="form.company_legal_name" /></div>
+        <div class="form-group"><label>Сайт</label><input type="text" x-model="form.company_site" /></div>
+        <div class="form-group"><label>Описание</label><textarea x-model="form.company_description" rows="3"></textarea></div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Контакты</h3>
+        <div class="form-group"><label>Телефон</label><input type="text" x-model="form.company_phone" /></div>
+        <div class="form-group"><label>Телефон (raw)</label><input type="text" x-model="form.company_phone_raw" /></div>
+        <div class="form-group"><label>Email</label><input type="email" x-model="form.company_email" /></div>
+        <div class="form-group"><label>Режим работы</label><input type="text" x-model="form.company_working_hours" /></div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Адрес</h3>
+        <div class="form-group"><label>Полный адрес</label><input type="text" x-model="form.company_address_full" /></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Город</label><input type="text" x-model="form.company_address_city" /></div>
+          <div class="form-group"><label>Регион</label><input type="text" x-model="form.company_address_region" /></div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group"><label>Почтовый индекс</label><input type="text" x-model="form.company_address_postal" /></div>
+          <div class="form-group"><label>Страна</label><input type="text" x-model="form.company_address_country" /></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Реквизиты и соцсети</h3>
+        <div class="grid-2">
+          <div class="form-group"><label>ИНН</label><input type="text" x-model="form.company_inn" /></div>
+          <div class="form-group"><label>ОГРН</label><input type="text" x-model="form.company_ogrn" /></div>
+        </div>
+        <div class="form-group"><label>Год основания</label><input type="text" x-model="form.company_founded_year" /></div>
+        <div class="form-group"><label>Telegram</label><input type="text" x-model="form.company_social_telegram" /></div>
+        <div class="form-group"><label>ВКонтакте</label><input type="text" x-model="form.company_social_vk" /></div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Аналитика</h3>
+      <div class="form-group">
+        <label>ID Яндекс.Метрики</label>
+        <input type="text" x-model="form.metrika_id" placeholder="12345678" />
+        <div class="help">Оставьте пустым, если метрика не нужна</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: right;">
+      <button class="btn btn-primary" @click="save()" :disabled="saving">
+        <span x-show="!saving">Сохранить настройки</span>
+        <span x-show="saving">Сохранение...</span>
+      </button>
+    </div>
+  </div>
+
+  <script is:inline>
+    function settingsForm(initial) {
+      return {
+        form: initial,
+        saving: false,
+        async save() {
+          this.saving = true;
+          try {
+            const res = await fetch('/api/v1/settings', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.form),
+            });
+            if (res.ok) {
+              alert('Настройки сохранены!');
+            } else {
+              alert('Ошибка сохранения');
+            }
+          } catch {
+            alert('Ошибка сети');
+          } finally {
+            this.saving = false;
+          }
+        },
+      };
+    }
+  </script>
+</AdminLayout>

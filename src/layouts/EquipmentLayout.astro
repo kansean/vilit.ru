@@ -1,0 +1,157 @@
+---
+import PageLayout from './PageLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import InlineLeadForm from '../components/forms/InlineLeadForm.astro';
+import JsonLdProduct from '../components/seo/JsonLdProduct.astro';
+import { buildBreadcrumbs } from '../utils/breadcrumbs';
+import { formatPrice } from '../utils/formatters';
+
+interface Props {
+  title: string;
+  description: string;
+  metaTitle: string;
+  metaDescription: string;
+  category: string;
+  brand: string;
+  model: string;
+  price: number;
+  oldPrice?: number;
+  image?: string;
+  inStock?: boolean;
+  features?: string[];
+  specs?: Record<string, string>;
+  slug: string;
+  contentHtml?: string;
+}
+
+const {
+  title, description, metaTitle, metaDescription,
+  category, brand, model, price, oldPrice, image,
+  inStock = true, features, specs, slug, contentHtml,
+} = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+  'skanery': 'Сканеры',
+  'printery-chekov': 'Принтеры чеков',
+  'printery-etiketok': 'Принтеры этикеток',
+  'tsd': 'ТСД',
+  'kassy': 'Кассы',
+};
+
+const breadcrumbs = buildBreadcrumbs(`/oborudovanie/${category}/${slug}`, title);
+---
+
+<PageLayout title={metaTitle} description={metaDescription}>
+  <JsonLdProduct
+    name={title}
+    description={description}
+    url={`/oborudovanie/${category}/${slug}`}
+    image={image}
+    price={price}
+    brand={brand}
+    inStock={inStock}
+  />
+
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-12 lg:py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <!-- Image -->
+          <div class="bg-neutral-100 rounded-2xl aspect-square flex items-center justify-center">
+            {image ? (
+              <img src={image} alt={title} class="max-w-full max-h-full object-contain p-8" />
+            ) : (
+              <div class="text-6xl text-neutral-300">📦</div>
+            )}
+          </div>
+
+          <!-- Info -->
+          <div>
+            <div class="text-sm text-primary-600 font-medium mb-2">{brand}</div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-neutral-900 mb-4">{title}</h1>
+            <p class="text-neutral-600 mb-6">{description}</p>
+
+            <div class="flex items-baseline gap-3 mb-6">
+              <span class="text-3xl font-bold text-neutral-900">{formatPrice(price)}</span>
+              {oldPrice && (
+                <span class="text-lg text-neutral-400 line-through">{formatPrice(oldPrice)}</span>
+              )}
+            </div>
+
+            <div class="flex items-center gap-2 mb-6">
+              {inStock ? (
+                <>
+                  <span class="w-2.5 h-2.5 bg-green-500 rounded-full"></span>
+                  <span class="text-green-700 font-medium text-sm">В наличии</span>
+                </>
+              ) : (
+                <>
+                  <span class="w-2.5 h-2.5 bg-orange-500 rounded-full"></span>
+                  <span class="text-orange-700 font-medium text-sm">Под заказ</span>
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              data-callback
+              class="w-full sm:w-auto bg-primary-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-primary-700 transition-colors mb-8"
+            >
+              Заказать
+            </button>
+
+            <!-- Features -->
+            {features && features.length > 0 && (
+              <div class="border-t border-neutral-200 pt-6">
+                <h2 class="text-lg font-bold text-neutral-900 mb-4">Особенности</h2>
+                <ul class="space-y-2">
+                  {features.map((f) => (
+                    <li class="flex items-start gap-2 text-sm text-neutral-700">
+                      <svg class="w-4 h-4 text-primary-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- Specs -->
+        {specs && Object.keys(specs).length > 0 && (
+          <div class="mt-12 border-t border-neutral-200 pt-8">
+            <h2 class="text-xl font-bold text-neutral-900 mb-6">Характеристики</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(specs).map(([key, value]) => (
+                <div class="flex justify-between py-2 border-b border-neutral-100">
+                  <span class="text-neutral-600">{key}</span>
+                  <span class="font-medium text-neutral-900">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Content -->
+        <div class="mt-12 max-w-3xl prose">
+          {contentHtml ? <Fragment set:html={contentHtml} /> : <slot />}
+        </div>
+      </Container>
+    </section>
+
+    <section class="py-12">
+      <Container>
+        <InlineLeadForm title="Нужна помощь с выбором оборудования?" />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

@@ -1,0 +1,33 @@
+---
+import ServiceLayout from '../../layouts/ServiceLayout.astro';
+import { servicesRepo } from '../../lib/services.repo';
+import { renderMarkdown } from '../../lib/markdown';
+import { safeJsonParse } from '../../lib/safe-json';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
+
+const row = servicesRepo.getById(slug);
+if (!row) return Astro.redirect('/404');
+
+const contentHtml = renderMarkdown(row.content);
+---
+
+<ServiceLayout
+  title={row.title}
+  description={row.description}
+  metaTitle={row.meta_title}
+  metaDescription={row.meta_description}
+  heroTitle={row.hero_title}
+  heroSubtitle={row.hero_subtitle}
+  icon={row.icon}
+  price={row.price || undefined}
+  priceNote={row.price_note || undefined}
+  features={safeJsonParse<string[]>(row.features, [])}
+  steps={safeJsonParse<{title:string;description:string}[]>(row.steps, [])}
+  faq={safeJsonParse<{question:string;answer:string}[]>(row.faq, [])}
+  slug={row.id}
+  relatedServices={safeJsonParse<string[]>(row.related_services, [])}
+  relatedIndustries={safeJsonParse<string[]>(row.related_industries, [])}
+  contentHtml={contentHtml}
+/>

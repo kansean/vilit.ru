@@ -1,0 +1,129 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { blogRepo } from '../../../lib/blog.repo';
+import { safeJsonParse } from '../../../lib/safe-json';
+
+const { id } = Astro.params;
+const isNew = id === 'new';
+const item = isNew ? null : blogRepo.getById(id!);
+
+if (!isNew && !item) {
+  return Astro.redirect('/admin/blog');
+}
+
+const title = isNew ? 'Новая статья' : `Редактирование: ${item!.title}`;
+
+const formData = isNew ? {
+  id: '', title: '', description: '', meta_title: '', meta_description: '',
+  publish_date: new Date().toISOString().split('T')[0], updated_date: '',
+  author: 'Вилит', tags: [] as string[], related_services: [] as string[], content: ''
+} : {
+  ...item,
+  tags: safeJsonParse<string[]>(item!.tags, []),
+  related_services: safeJsonParse<string[]>(item!.related_services, []),
+  updated_date: item!.updated_date || '',
+};
+---
+
+<AdminLayout title={title}>
+  <div x-data={`blogForm(${JSON.stringify(formData)})`}>
+
+    <div class="flex-between">
+      <a href="/admin/blog" class="btn btn-secondary btn-sm">← Назад</a>
+      <div class="actions">
+        {!isNew && <button class="btn btn-danger btn-sm" @click="deleteItem()">Удалить</button>}
+        <button class="btn btn-primary" @click="save()" :disabled="saving">Сохранить</button>
+      </div>
+    </div>
+
+    <div class="grid-2 mt-4">
+      <div>
+        <div class="card">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Основное</h3>
+          {isNew && (
+            <div class="form-group">
+              <label>Slug (id)</label>
+              <input type="text" x-model="form.id" placeholder="kak-vybrat-kassu" />
+              <div class="help">Латиница, дефисы. URL: /blog/slug</div>
+            </div>
+          )}
+          <div class="form-group"><label>Заголовок</label><input type="text" x-model="form.title" /></div>
+          <div class="form-group"><label>Описание</label><textarea x-model="form.description" rows="2"></textarea></div>
+          <div class="grid-2">
+            <div class="form-group"><label>Дата публикации</label><input type="date" x-model="form.publish_date" /></div>
+            <div class="form-group"><label>Дата обновления</label><input type="date" x-model="form.updated_date" /></div>
+          </div>
+          <div class="form-group"><label>Автор</label><input type="text" x-model="form.author" /></div>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">SEO</h3>
+          <div class="form-group"><label>Meta Title</label><input type="text" x-model="form.meta_title" /></div>
+          <div class="form-group"><label>Meta Description</label><textarea x-model="form.meta_description" rows="2"></textarea></div>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Теги</h3>
+          <template x-for="(t, i) in form.tags" :key="i">
+            <div class="array-item"><input type="text" x-model="form.tags[i]" /><button @click="form.tags.splice(i, 1)">×</button></div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.tags.push('')">+ Добавить</button>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Связи</h3>
+          <div class="form-group">
+            <label>Связанные услуги</label>
+            <input type="text" :value="form.related_services.join(', ')"
+              @change="form.related_services = $event.target.value.split(',').map(s => s.trim()).filter(Boolean)" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="height: calc(100% - 0px);">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Контент (Markdown)</h3>
+          <textarea x-model="form.content" rows="30" style="width:100%;font-family:monospace;font-size:0.8125rem;padding:0.625rem;border:1px solid #d1d5db;border-radius:0.5rem;min-height:500px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem; text-align: right;">
+      <button class="btn btn-primary" @click="save()" :disabled="saving">Сохранить</button>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ isNew, itemId: isNew ? '' : id }}>
+    function blogForm(initial) {
+      return {
+        form: initial,
+        saving: false,
+        async save() {
+          this.saving = true;
+          try {
+            const body = {
+              ...this.form,
+              tags: JSON.stringify(this.form.tags.filter(Boolean)),
+              related_services: JSON.stringify(this.form.related_services),
+              updated_date: this.form.updated_date || null,
+            };
+            delete body.created_at; delete body.updated_at;
+            const url = isNew ? '/api/v1/blog' : `/api/v1/blog/${itemId}`;
+            const method = isNew ? 'POST' : 'PUT';
+            const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (res.ok) {
+              if (isNew) { const data = await res.json(); window.location.href = `/admin/blog/${data.item.id}`; }
+              else { alert('Сохранено!'); }
+            } else { const err = await res.json(); alert('Ошибка: ' + (err.error || 'Неизвестная ошибка')); }
+          } catch { alert('Ошибка сети'); } finally { this.saving = false; }
+        },
+        async deleteItem() {
+          if (!confirm('Удалить статью?')) return;
+          const res = await fetch(`/api/v1/blog/${itemId}`, { method: 'DELETE' });
+          if (res.ok) window.location.href = '/admin/blog';
+          else alert('Ошибка удаления');
+        },
+      };
+    }
+  </script>
+</AdminLayout>

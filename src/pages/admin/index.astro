@@ -1,0 +1,81 @@
+---
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+import { servicesRepo } from '../../lib/services.repo';
+import { industriesRepo } from '../../lib/industries.repo';
+import { equipmentRepo } from '../../lib/equipment.repo';
+import { blogRepo } from '../../lib/blog.repo';
+import { leadsRepo } from '../../lib/leads.repo';
+
+const stats = {
+  services: servicesRepo.count(),
+  industries: industriesRepo.count(),
+  equipment: equipmentRepo.count(),
+  blog: blogRepo.count(),
+  leadsNew: leadsRepo.countNew(),
+  leadsTotal: leadsRepo.count(),
+};
+
+const recentLeads = leadsRepo.list({ limit: 5 }).items;
+---
+
+<AdminLayout title="Dashboard">
+  <div class="grid-5 mb-6">
+    <div class="card stat-card">
+      <div class="number">{stats.services}</div>
+      <div class="label">Услуги</div>
+    </div>
+    <div class="card stat-card">
+      <div class="number">{stats.industries}</div>
+      <div class="label">Отрасли</div>
+    </div>
+    <div class="card stat-card">
+      <div class="number">{stats.equipment}</div>
+      <div class="label">Оборудование</div>
+    </div>
+    <div class="card stat-card">
+      <div class="number">{stats.blog}</div>
+      <div class="label">Статьи</div>
+    </div>
+    <div class="card stat-card">
+      <div class="number" style="color: #2563eb;">{stats.leadsNew}</div>
+      <div class="label">Новых заявок</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <h2 style="font-size: 1.125rem; font-weight: 600;">Последние заявки</h2>
+      <a href="/admin/leads" class="btn btn-secondary btn-sm">Все заявки ({stats.leadsTotal})</a>
+    </div>
+    {recentLeads.length > 0 ? (
+      <table>
+        <thead>
+          <tr>
+            <th>Тип</th>
+            <th>Имя</th>
+            <th>Телефон</th>
+            <th>Статус</th>
+            <th>Дата</th>
+          </tr>
+        </thead>
+        <tbody>
+          {recentLeads.map((lead) => (
+            <tr>
+              <td>{lead.type === 'callback' ? 'Звонок' : lead.type === 'request' ? 'Заявка' : 'Калькулятор'}</td>
+              <td>{lead.name || '—'}</td>
+              <td>{lead.phone}</td>
+              <td>
+                <span class={`badge badge-${lead.status}`}>
+                  {lead.status === 'new' ? 'Новая' : lead.status === 'processing' ? 'В работе' : 'Выполнена'}
+                </span>
+              </td>
+              <td class="text-muted text-sm">{new Date(lead.created_at).toLocaleString('ru-RU')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p class="text-muted">Заявок пока нет</p>
+    )}
+  </div>
+</AdminLayout>

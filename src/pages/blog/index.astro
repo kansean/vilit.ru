@@ -1,0 +1,64 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '../../utils/breadcrumbs';
+import { formatDate } from '../../utils/formatters';
+import { blogRepo } from '../../lib/blog.repo';
+import { safeJsonParse } from '../../lib/safe-json';
+
+const rawPosts = blogRepo.list();
+const posts = rawPosts.map(post => ({
+  ...post,
+  parsedTags: safeJsonParse<string[]>(post.tags, []),
+}));
+const breadcrumbs = buildBreadcrumbs('/blog', 'Блог');
+---
+
+<PageLayout title="Блог" description="Статьи об автоматизации торговли, онлайн-кассах, маркировке, ЕГАИС и другие полезные материалы для бизнеса.">
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="text-3xl sm:text-4xl font-bold mb-4">Блог</h1>
+        <p class="text-lg text-primary-100 max-w-2xl">
+          Полезные статьи об автоматизации торговли, законодательстве и оборудовании
+        </p>
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        {posts.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+                <a
+                  href={`/blog/${post.id}`}
+                  class="group block bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                >
+                  <div class="p-6">
+                    {post.parsedTags.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 mb-3">
+                          {post.parsedTags.slice(0, 2).map((tag) => (
+                          <span class="bg-primary-50 text-primary-700 px-2 py-0.5 rounded text-xs font-medium">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                    <h2 class="text-lg font-bold text-neutral-900 group-hover:text-primary-600 mb-2 line-clamp-2">{post.title}</h2>
+                    <p class="text-neutral-600 text-sm line-clamp-3 mb-4">{post.description}</p>
+                    <time class="text-xs text-neutral-400" datetime={post.publish_date}>
+                      {formatDate(new Date(post.publish_date))}
+                    </time>
+                  </div>
+                </a>
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-12">
+            <p class="text-neutral-500 text-lg">Скоро здесь появятся статьи</p>
+          </div>
+        )}
+      </Container>
+    </section>
+  </main>
+</PageLayout>

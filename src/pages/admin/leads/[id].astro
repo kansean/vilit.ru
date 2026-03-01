@@ -1,0 +1,99 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { leadsRepo } from '../../../lib/leads.repo';
+
+const { id } = Astro.params;
+const lead = leadsRepo.getById(Number(id));
+
+if (!lead) {
+  return Astro.redirect('/admin/leads');
+}
+
+const typeLabels: Record<string, string> = {
+  callback: 'Обратный звонок',
+  request: 'Заявка с сайта',
+  calculator: 'Заявка из калькулятора',
+};
+---
+
+<AdminLayout title={`Заявка #${lead.id}`}>
+  <div class="flex-between">
+    <a href="/admin/leads" class="btn btn-secondary btn-sm">← Назад</a>
+    <div class="actions" x-data={`{ status: '${lead.status}' }`}>
+      <select x-model="status" @change="updateStatus($event.target.value)" style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;">
+        <option value="new">Новая</option>
+        <option value="processing">В работе</option>
+        <option value="done">Выполнена</option>
+      </select>
+      <button class="btn btn-danger btn-sm" onclick="deleteLead()">Удалить</button>
+    </div>
+  </div>
+
+  <div class="grid-2 mt-4">
+    <div class="card">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Информация</h3>
+      <table style="box-shadow: none;">
+        <tbody>
+          <tr><td style="font-weight: 500; width: 150px;">Тип</td><td>{typeLabels[lead.type] || lead.type}</td></tr>
+          <tr><td style="font-weight: 500;">Имя</td><td>{lead.name || '—'}</td></tr>
+          <tr><td style="font-weight: 500;">Телефон</td><td><a href={`tel:${lead.phone}`} style="color: #2563eb;">{lead.phone}</a></td></tr>
+          <tr><td style="font-weight: 500;">Email</td><td>{lead.email || '—'}</td></tr>
+          <tr><td style="font-weight: 500;">Тип бизнеса</td><td>{lead.business_type || '—'}</td></tr>
+          <tr><td style="font-weight: 500;">Статус</td><td>
+            <span class={`badge badge-${lead.status}`}>
+              {lead.status === 'new' ? 'Новая' : lead.status === 'processing' ? 'В работе' : 'Выполнена'}
+            </span>
+          </td></tr>
+          <tr><td style="font-weight: 500;">Дата</td><td>{new Date(lead.created_at).toLocaleString('ru-RU')}</td></tr>
+          <tr><td style="font-weight: 500;">Страница</td><td class="text-sm">{lead.source_page || '—'}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Дополнительно</h3>
+      {lead.message && (
+        <div class="form-group">
+          <label>Сообщение</label>
+          <div style="padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; font-size: 0.875rem;">{lead.message}</div>
+        </div>
+      )}
+      {lead.services_list && (
+        <div class="form-group">
+          <label>Выбранные услуги</label>
+          <div style="padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; font-size: 0.875rem;">{lead.services_list}</div>
+        </div>
+      )}
+      {lead.total && (
+        <div class="form-group">
+          <label>Рассчитанная сумма</label>
+          <div style="padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; font-size: 1.125rem; font-weight: 600;">
+            от {lead.total.toLocaleString('ru-RU')} ₽
+          </div>
+        </div>
+      )}
+      {!lead.message && !lead.services_list && !lead.total && (
+        <p class="text-muted">Дополнительных данных нет</p>
+      )}
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ leadId: lead.id }}>
+    async function updateStatus(status) {
+      const res = await fetch(`/api/v1/leads/${leadId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) location.reload();
+      else alert('Ошибка обновления статуса');
+    }
+
+    async function deleteLead() {
+      if (!confirm('Удалить заявку?')) return;
+      const res = await fetch(`/api/v1/leads/${leadId}`, { method: 'DELETE' });
+      if (res.ok) window.location.href = '/admin/leads';
+      else alert('Ошибка удаления');
+    }
+  </script>
+</AdminLayout>

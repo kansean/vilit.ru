@@ -1,0 +1,36 @@
+---
+import Container from '../ui/Container.astro';
+import IndustryCard from '../ui/IndustryCard.astro';
+
+const industries = [
+  { title: 'Магазин', description: 'Продуктовый, хозяйственный, одежда — полный комплект для розничной торговли', href: '/dlya-biznesa/magazin', icon: '🛒' },
+  { title: 'Кафе', description: 'Кассы для общепита, система лояльности, учёт блюд и ингредиентов', href: '/dlya-biznesa/kafe', icon: '☕' },
+  { title: 'Пивной магазин', description: 'ЕГАИС, кеговый учёт, маркировка — всё для легальной продажи пива', href: '/dlya-biznesa/pivnoy-magazin', icon: '🍺' },
+  { title: 'Кофейня', description: 'Компактные кассы, быстрое обслуживание, интеграция с доставкой', href: '/dlya-biznesa/kofeynya', icon: '☕' },
+  { title: 'Салон красоты', description: 'Онлайн-запись, учёт услуг и материалов, маркировка парфюмерии', href: '/dlya-biznesa/salon-krasoty', icon: '💇' },
+  { title: 'Аптека', description: 'Маркировка лекарств, МДЛП, подключение к системе мониторинга', href: '/dlya-biznesa/apteka', icon: '💊' },
+  { title: 'Ресторан', description: 'Автоматизация зала и кухни, R-Keeper, iiko и другие системы', href: '/dlya-biznesa/restoran', icon: '🍽️' },
+  { title: 'Пекарня', description: 'Учёт производства, маркировка, весовой товар, выгодные комплекты', href: '/dlya-biznesa/pekarnya', icon: '🥐' },
+  { title: 'Цветочный магазин', description: 'Касса для цветов, учёт скоропортящегося товара, доставка', href: '/dlya-biznesa/tsvetochnyy-magazin', icon: '💐' },
+  { title: 'Табачный магазин', description: 'Маркировка табака, МРЦ, акцизы — полное соответствие законодательству', href: '/dlya-biznesa/tabachnyy-magazin', icon: '🚬' },
+  { title: 'Столовая', description: 'Автоматизация буфетов и столовых, безналичный расчёт, отчётность', href: '/dlya-biznesa/stolovaya', icon: '🍲' },
+  { title: 'Автомойка', description: 'Учёт услуг, абонементы, интеграция с терминалами оплаты', href: '/dlya-biznesa/avtomoyika', icon: '🚗' },
+];
+---
+
+<section class="section bg-neutral-50" id="industries">
+  <Container>
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">Решения для вашего бизнеса</h2>
+      <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+        Подберём оборудование и настроим всё необходимое с учётом специфики вашей отрасли
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {industries.map((industry) => (
+        <IndustryCard {...industry} />
+      ))}
+    </div>
+  </Container>
+</section>

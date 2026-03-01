@@ -1,0 +1,66 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { leadsRepo } from '../../../lib/leads.repo';
+
+const status = Astro.url.searchParams.get('status') || undefined;
+const type = Astro.url.searchParams.get('type') || undefined;
+const { items: leads, total } = leadsRepo.list({ status, type, limit: 100 });
+
+const typeLabels: Record<string, string> = {
+  callback: 'Звонок',
+  request: 'Заявка',
+  calculator: 'Калькулятор',
+};
+---
+
+<AdminLayout title="Заявки">
+  <div class="flex-between">
+    <div class="actions">
+      <a href="/admin/leads" class={`btn btn-sm ${!status ? 'btn-primary' : 'btn-secondary'}`}>Все ({total})</a>
+      <a href="/admin/leads?status=new" class={`btn btn-sm ${status === 'new' ? 'btn-primary' : 'btn-secondary'}`}>Новые</a>
+      <a href="/admin/leads?status=processing" class={`btn btn-sm ${status === 'processing' ? 'btn-primary' : 'btn-secondary'}`}>В работе</a>
+      <a href="/admin/leads?status=done" class={`btn btn-sm ${status === 'done' ? 'btn-primary' : 'btn-secondary'}`}>Выполнены</a>
+    </div>
+  </div>
+
+  {leads.length > 0 ? (
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Тип</th>
+          <th>Имя</th>
+          <th>Телефон</th>
+          <th>Email</th>
+          <th>Статус</th>
+          <th>Дата</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {leads.map((lead) => (
+          <tr>
+            <td class="text-sm text-muted">{lead.id}</td>
+            <td class="text-sm">{typeLabels[lead.type] || lead.type}</td>
+            <td>{lead.name || '—'}</td>
+            <td><a href={`tel:${lead.phone}`} style="color: #2563eb;">{lead.phone}</a></td>
+            <td class="text-sm">{lead.email || '—'}</td>
+            <td>
+              <span class={`badge badge-${lead.status}`}>
+                {lead.status === 'new' ? 'Новая' : lead.status === 'processing' ? 'В работе' : 'Выполнена'}
+              </span>
+            </td>
+            <td class="text-sm text-muted">{new Date(lead.created_at).toLocaleString('ru-RU')}</td>
+            <td>
+              <a href={`/admin/leads/${lead.id}`} class="btn btn-secondary btn-sm">Подробнее</a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <div class="card" style="text-align: center; padding: 3rem;">
+      <p class="text-muted">Нет заявок</p>
+    </div>
+  )}
+</AdminLayout>

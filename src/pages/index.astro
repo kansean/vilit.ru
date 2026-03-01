@@ -1,0 +1,45 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import HeroHome from '../components/sections/HeroHome.astro';
+import TrustBar from '../components/sections/TrustBar.astro';
+import ServicesGrid from '../components/sections/ServicesGrid.astro';
+import IndustriesGrid from '../components/sections/IndustriesGrid.astro';
+import HowItWorks from '../components/sections/HowItWorks.astro';
+import PartnersLogos from '../components/sections/PartnersLogos.astro';
+import Testimonials from '../components/sections/Testimonials.astro';
+import CalculatorForm from '../components/forms/CalculatorForm.astro';
+import InlineLeadForm from '../components/forms/InlineLeadForm.astro';
+import Container from '../components/ui/Container.astro';
+import JsonLdLocalBusiness from '../components/seo/JsonLdLocalBusiness.astro';
+---
+
+<PageLayout
+  title="Вилит"
+  description="Автоматизация розничной торговли: онлайн-кассы, ОФД, маркировка, ЕГАИС, ЭЦП. Поставка оборудования и подключение сервисов для магазинов, кафе и сферы услуг."
+>
+  <JsonLdLocalBusiness />
+
+  <main>
+    <HeroHome />
+    <TrustBar />
+    <ServicesGrid />
+
+    <section class="py-12">
+      <Container>
+        <InlineLeadForm title="Не знаете, что нужно? Поможем разобраться!" />
+      </Container>
+    </section>
+
+    <IndustriesGrid />
+    <CalculatorForm />
+    <HowItWorks />
+    <Testimonials />
+    <PartnersLogos />
+
+    <section class="py-16">
+      <Container>
+        <InlineLeadForm title="Готовы начать? Получите бесплатную консультацию" />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

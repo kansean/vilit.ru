@@ -1,0 +1,80 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import Container from '../../../components/ui/Container.astro';
+import EquipmentCard from '../../../components/ui/EquipmentCard.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import InlineLeadForm from '../../../components/forms/InlineLeadForm.astro';
+import { buildBreadcrumbs } from '../../../utils/breadcrumbs';
+import { equipmentRepo } from '../../../lib/equipment.repo';
+
+const categoryLabels: Record<string, string> = {
+  'skanery': 'Сканеры штрихкодов',
+  'printery-chekov': 'Принтеры чеков',
+  'printery-etiketok': 'Принтеры этикеток',
+  'tsd': 'Терминалы сбора данных (ТСД)',
+  'kassy': 'Кассы',
+};
+
+const categoryDescriptions: Record<string, string> = {
+  'skanery': 'Проводные и беспроводные сканеры штрихкодов 1D и 2D для розницы, складов и маркировки.',
+  'printery-chekov': 'Термопринтеры чеков для онлайн-касс и POS-систем.',
+  'printery-etiketok': 'Принтеры этикеток для маркировки, складского учёта и ценников.',
+  'tsd': 'Терминалы сбора данных для инвентаризации, приёмки товара и маркировки.',
+  'kassy': 'Онлайн-кассы и POS-системы для розничной торговли и общепита.',
+};
+
+const { category } = Astro.params;
+
+if (!category || !categoryLabels[category]) {
+  return Astro.redirect('/oborudovanie');
+}
+
+const label = categoryLabels[category];
+const desc = categoryDescriptions[category] || '';
+const breadcrumbs = buildBreadcrumbs(`/oborudovanie/${category}`, label);
+
+const items = equipmentRepo.listByCategory(category);
+---
+
+<PageLayout title={label} description={desc}>
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="text-3xl sm:text-4xl font-bold mb-4">{label}</h1>
+        <p class="text-lg text-primary-100 max-w-2xl">{desc}</p>
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        {items.length > 0 ? (
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {items.map((item) => (
+              <EquipmentCard
+                title={item.title}
+                brand={item.brand}
+                price={item.price}
+                oldPrice={item.old_price || undefined}
+                href={`/oborudovanie/${item.category}/${item.id}`}
+                image={item.image || undefined}
+                inStock={!!item.in_stock}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-12">
+            <p class="text-neutral-500 text-lg">Каталог в этой категории скоро будет пополнен</p>
+            <a href="/oborudovanie" class="text-primary-600 font-medium mt-4 inline-block">← Все категории</a>
+          </div>
+        )}
+      </Container>
+    </section>
+
+    <section class="py-16">
+      <Container>
+        <InlineLeadForm title="Нужна помощь с выбором?" />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

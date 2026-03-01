@@ -1,0 +1,41 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+
+const steps = [
+  { number: '01', title: 'Оставляете заявку', description: 'Вы звоните или оставляете заявку на сайте. Мы перезваниваем за 5 минут.' },
+  { number: '02', title: 'Подбираем решение', description: 'Выясняем специфику вашего бизнеса и подбираем оптимальный комплект оборудования и услуг.' },
+  { number: '03', title: 'Настраиваем и подключаем', description: 'Доставляем оборудование, регистрируем кассу в ФНС, подключаем ОФД и все необходимые сервисы.' },
+  { number: '04', title: 'Обучаем и поддерживаем', description: 'Обучаем персонал работе с кассой и оказываем техническую поддержку.' },
+];
+---
+
+<section class="section bg-white" id="how-it-works">
+  <Container>
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">Как мы работаем</h2>
+      <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+        От заявки до работающей кассы — 4 простых шага
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      {steps.map((step, index) => (
+        <div class="relative">
+          {index < steps.length - 1 && (
+            <div class="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-primary-100 -translate-x-1/2"></div>
+          )}
+          <div class="text-5xl font-bold text-primary-100 mb-4">{step.number}</div>
+          <h3 class="text-lg font-bold text-neutral-900 mb-2">{step.title}</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">{step.description}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="text-center">
+      <Button variant="primary" size="lg" data-callback>
+        Оставить заявку
+      </Button>
+    </div>
+  </Container>
+</section>

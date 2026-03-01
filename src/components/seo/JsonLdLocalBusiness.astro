@@ -1,0 +1,25 @@
+---
+import { company } from '../../data/company';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: company.name,
+  description: company.description,
+  url: company.site,
+  telephone: company.phone,
+  email: company.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: company.address.full,
+    addressLocality: company.address.city,
+    addressRegion: company.address.region,
+    postalCode: company.address.postalCode,
+    addressCountry: company.address.country,
+  },
+  openingHours: 'Mo-Fr 09:00-18:00',
+  priceRange: '₽₽',
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

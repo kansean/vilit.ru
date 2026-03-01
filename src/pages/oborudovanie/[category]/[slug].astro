@@ -1,0 +1,32 @@
+---
+import EquipmentLayout from '../../../layouts/EquipmentLayout.astro';
+import { equipmentRepo } from '../../../lib/equipment.repo';
+import { renderMarkdown } from '../../../lib/markdown';
+import { safeJsonParse } from '../../../lib/safe-json';
+
+const { category, slug } = Astro.params;
+if (!slug || !category) return Astro.redirect('/404');
+
+const row = equipmentRepo.getById(slug);
+if (!row || row.category !== category) return Astro.redirect('/404');
+
+const contentHtml = renderMarkdown(row.content);
+---
+
+<EquipmentLayout
+  title={row.title}
+  description={row.description}
+  metaTitle={row.meta_title}
+  metaDescription={row.meta_description}
+  category={row.category}
+  brand={row.brand}
+  model={row.model}
+  price={row.price}
+  oldPrice={row.old_price || undefined}
+  image={row.image || undefined}
+  inStock={!!row.in_stock}
+  features={safeJsonParse<string[]>(row.features, [])}
+  specs={safeJsonParse<Record<string,string>>(row.specs, {})}
+  slug={row.id}
+  contentHtml={contentHtml}
+/>

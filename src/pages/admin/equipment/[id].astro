@@ -1,0 +1,159 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { equipmentRepo } from '../../../lib/equipment.repo';
+import { safeJsonParse } from '../../../lib/safe-json';
+
+const { id } = Astro.params;
+const isNew = id === 'new';
+const item = isNew ? null : equipmentRepo.getById(id!);
+
+if (!isNew && !item) {
+  return Astro.redirect('/admin/equipment');
+}
+
+const title = isNew ? 'Новый товар' : `Редактирование: ${item!.title}`;
+
+const specsObj = isNew ? {} : safeJsonParse<Record<string,string>>(item!.specs, {});
+const specsArr = Object.entries(specsObj).map(([k, v]) => ({ key: k, value: v as string }));
+
+const formData = isNew ? {
+  id: '', title: '', description: '', meta_title: '', meta_description: '',
+  category: 'skanery', brand: '', model: '', price: 0, old_price: null as number | null,
+  image: '', in_stock: 1, features: [] as string[], specs: [] as {key:string;value:string}[], sort_order: 0, content: ''
+} : {
+  ...item,
+  features: safeJsonParse<string[]>(item!.features, []),
+  specs: specsArr,
+  image: item!.image || '',
+  old_price: item!.old_price || '',
+};
+---
+
+<AdminLayout title={title}>
+  <div x-data={`equipForm(${JSON.stringify(formData)})`}>
+
+    <div class="flex-between">
+      <a href="/admin/equipment" class="btn btn-secondary btn-sm">← Назад</a>
+      <div class="actions">
+        {!isNew && <button class="btn btn-danger btn-sm" @click="deleteItem()">Удалить</button>}
+        <button class="btn btn-primary" @click="save()" :disabled="saving">Сохранить</button>
+      </div>
+    </div>
+
+    <div class="grid-2 mt-4">
+      <div>
+        <div class="card">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Основное</h3>
+          {isNew && (
+            <div class="form-group">
+              <label>Slug (id)</label>
+              <input type="text" x-model="form.id" placeholder="atol-sigma-10" />
+            </div>
+          )}
+          <div class="form-group"><label>Название</label><input type="text" x-model="form.title" /></div>
+          <div class="form-group"><label>Описание</label><textarea x-model="form.description" rows="2"></textarea></div>
+          <div class="form-group">
+            <label>Категория</label>
+            <select x-model="form.category">
+              <option value="skanery">Сканеры</option>
+              <option value="printery-chekov">Принтеры чеков</option>
+              <option value="printery-etiketok">Принтеры этикеток</option>
+              <option value="tsd">ТСД</option>
+              <option value="kassy">Кассы</option>
+            </select>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label>Бренд</label><input type="text" x-model="form.brand" /></div>
+            <div class="form-group"><label>Модель</label><input type="text" x-model="form.model" /></div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label>Цена (₽)</label><input type="number" x-model.number="form.price" /></div>
+            <div class="form-group"><label>Старая цена</label><input type="number" x-model.number="form.old_price" /></div>
+          </div>
+          <div class="form-group"><label>Изображение (URL)</label><input type="text" x-model="form.image" /></div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" x-model="form.in_stock" :true-value="1" :false-value="0" style="width:auto;margin-right:0.5rem;" />
+              В наличии
+            </label>
+          </div>
+          <div class="form-group"><label>Порядок</label><input type="number" x-model.number="form.sort_order" /></div>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">SEO</h3>
+          <div class="form-group"><label>Meta Title</label><input type="text" x-model="form.meta_title" /></div>
+          <div class="form-group"><label>Meta Description</label><textarea x-model="form.meta_description" rows="2"></textarea></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Особенности</h3>
+          <template x-for="(f, i) in form.features" :key="i">
+            <div class="array-item"><input type="text" x-model="form.features[i]" /><button @click="form.features.splice(i, 1)">×</button></div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.features.push('')">+ Добавить</button>
+        </div>
+
+        <div class="card mt-4">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Характеристики</h3>
+          <template x-for="(s, i) in form.specs" :key="i">
+            <div class="kv-item">
+              <input type="text" x-model="form.specs[i].key" placeholder="Параметр" />
+              <input type="text" x-model="form.specs[i].value" placeholder="Значение" />
+              <button style="padding:0.375rem 0.5rem;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;border-radius:0.375rem;cursor:pointer;" @click="form.specs.splice(i, 1)">×</button>
+            </div>
+          </template>
+          <button class="btn btn-secondary btn-sm" @click="form.specs.push({key:'',value:''})">+ Добавить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Контент (Markdown)</h3>
+      <textarea x-model="form.content" rows="10" style="width:100%;font-family:monospace;font-size:0.8125rem;padding:0.625rem;border:1px solid #d1d5db;border-radius:0.5rem;"></textarea>
+    </div>
+
+    <div style="margin-top: 1rem; text-align: right;">
+      <button class="btn btn-primary" @click="save()" :disabled="saving">Сохранить</button>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ isNew, itemId: isNew ? '' : id }}>
+    function equipForm(initial) {
+      return {
+        form: initial,
+        saving: false,
+        async save() {
+          this.saving = true;
+          try {
+            const specsObj = {};
+            for (const s of this.form.specs) { if (s.key) specsObj[s.key] = s.value; }
+            const body = {
+              ...this.form,
+              features: JSON.stringify(this.form.features.filter(Boolean)),
+              specs: JSON.stringify(specsObj),
+              old_price: this.form.old_price || null,
+              image: this.form.image || null,
+            };
+            delete body.created_at; delete body.updated_at;
+            const url = isNew ? '/api/v1/equipment' : `/api/v1/equipment/${itemId}`;
+            const method = isNew ? 'POST' : 'PUT';
+            const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (res.ok) {
+              if (isNew) { const data = await res.json(); window.location.href = `/admin/equipment/${data.item.id}`; }
+              else { alert('Сохранено!'); }
+            } else { const err = await res.json(); alert('Ошибка: ' + (err.error || 'Неизвестная ошибка')); }
+          } catch { alert('Ошибка сети'); } finally { this.saving = false; }
+        },
+        async deleteItem() {
+          if (!confirm('Удалить товар?')) return;
+          const res = await fetch(`/api/v1/equipment/${itemId}`, { method: 'DELETE' });
+          if (res.ok) window.location.href = '/admin/equipment';
+          else alert('Ошибка удаления');
+        },
+      };
+    }
+  </script>
+</AdminLayout>

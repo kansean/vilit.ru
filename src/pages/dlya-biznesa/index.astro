@@ -1,0 +1,47 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import IndustryCard from '../../components/ui/IndustryCard.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import InlineLeadForm from '../../components/forms/InlineLeadForm.astro';
+import { buildBreadcrumbs } from '../../utils/breadcrumbs';
+import { industriesRepo } from '../../lib/industries.repo';
+
+const industries = industriesRepo.list();
+const breadcrumbs = buildBreadcrumbs('/dlya-biznesa', 'Для бизнеса');
+---
+
+<PageLayout title="Решения для бизнеса" description="Автоматизация розничной торговли для магазинов, кафе, ресторанов, аптек, салонов красоты и других видов бизнеса. Подбор оборудования и настройка под ключ.">
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="text-3xl sm:text-4xl font-bold mb-4">Решения для вашего бизнеса</h1>
+        <p class="text-lg text-primary-100 max-w-2xl">
+          Подберём оборудование и настроим всё необходимое с учётом специфики вашей отрасли
+        </p>
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {industries.map((industry) => (
+            <IndustryCard
+              title={industry.title}
+              description={industry.description}
+              href={`/dlya-biznesa/${industry.id}`}
+              icon={industry.icon}
+            />
+          ))}
+        </div>
+      </Container>
+    </section>
+
+    <section class="pb-16">
+      <Container>
+        <InlineLeadForm />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

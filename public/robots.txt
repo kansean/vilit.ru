@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://vilit.ru/sitemap-index.xml
+Host: https://vilit.ru

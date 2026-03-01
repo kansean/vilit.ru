@@ -1,0 +1,128 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div id="callback-modal" class="fixed inset-0 z-50 hidden">
+  <div id="callback-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="absolute inset-0 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+      <button
+        type="button"
+        id="callback-close"
+        class="absolute top-4 right-4 p-1 text-neutral-400 hover:text-neutral-700 transition-colors"
+        aria-label="Закрыть"
+      >
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h3 class="text-xl font-bold text-neutral-900 mb-2">Обратный звонок</h3>
+      <p class="text-neutral-600 text-sm mb-6">Оставьте номер — перезвоним за 5 минут</p>
+
+      <form id="callback-form" class="space-y-4">
+        <div>
+          <label for="callback-name" class="block text-sm font-medium text-neutral-700 mb-1">Имя</label>
+          <input
+            type="text"
+            id="callback-name"
+            name="name"
+            required
+            placeholder="Ваше имя"
+            class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+          />
+        </div>
+        <div>
+          <label for="callback-phone" class="block text-sm font-medium text-neutral-700 mb-1">Телефон</label>
+          <input
+            type="tel"
+            id="callback-phone"
+            name="phone"
+            required
+            placeholder="+7 (___) ___-__-__"
+            class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-neutral-900 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-primary-600 text-white font-semibold py-3 rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+        >
+          Перезвоните мне
+        </button>
+        <p class="text-xs text-neutral-500 text-center">
+          Нажимая кнопку, вы соглашаетесь с <a href="/politika-konfidentsialnosti" class="underline hover:text-primary-600">политикой конфиденциальности</a>
+        </p>
+      </form>
+
+      <div id="callback-success" class="hidden text-center py-8">
+        <div class="text-4xl mb-4">✓</div>
+        <h4 class="text-lg font-bold text-neutral-900 mb-2">Спасибо!</h4>
+        <p class="text-neutral-600">Мы перезвоним вам в ближайшее время</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    const modal = document.getElementById('callback-modal');
+    const backdrop = document.getElementById('callback-backdrop');
+    const closeBtn = document.getElementById('callback-close');
+    const form = document.getElementById('callback-form');
+    const success = document.getElementById('callback-success');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      form.classList.remove('hidden');
+      success.classList.add('hidden');
+      form.reset();
+    }
+
+    // Open triggers
+    document.querySelectorAll('#header-callback-btn, #mobile-callback-btn, #sticky-callback-btn, [data-callback]').forEach(function(btn) {
+      btn.addEventListener('click', openModal);
+    });
+
+    backdrop.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formData = new FormData(form);
+      var data = Object.fromEntries(formData);
+
+      // Send to serverless function
+      fetch('/api/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(function() {});
+
+      // Цель Яндекс.Метрики
+      if (typeof ym !== 'undefined' && window.__METRIKA_ID) {
+        ym(window.__METRIKA_ID, 'reachGoal', 'callback_form');
+      }
+
+      form.classList.add('hidden');
+      success.classList.remove('hidden');
+
+      setTimeout(closeModal, 3000);
+    });
+  })();
+</script>

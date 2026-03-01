@@ -1,0 +1,38 @@
+---
+import type { SEOProps } from '../../utils/seo';
+import { getFullTitle, getCanonicalURL } from '../../utils/seo';
+import { company } from '../../data/company';
+
+interface Props extends SEOProps {}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage = '/images/og-default.svg',
+  noindex = false,
+  type = 'website',
+} = Astro.props;
+
+const fullTitle = getFullTitle(title);
+const canonicalURL = canonical || getCanonicalURL(Astro.url.pathname);
+const ogImageURL = ogImage.startsWith('http') ? ogImage : `${company.site}${ogImage}`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalURL} />
+
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:site_name" content={company.name} />
+<meta property="og:locale" content="ru_RU" />
+
+<!-- Yandex -->
+<meta name="yandex-verification" content="" />

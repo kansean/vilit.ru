@@ -1,0 +1,48 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import ServiceCard from '../../components/ui/ServiceCard.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import InlineLeadForm from '../../components/forms/InlineLeadForm.astro';
+import { buildBreadcrumbs } from '../../utils/breadcrumbs';
+import { servicesRepo } from '../../lib/services.repo';
+
+const services = servicesRepo.list();
+const breadcrumbs = buildBreadcrumbs('/uslugi', 'Услуги');
+---
+
+<PageLayout title="Услуги" description="Все услуги компании Вилит: онлайн-кассы, ОФД, маркировка, ЕГАИС, ЭЦП, регистрация в ФНС, торговое оборудование и программное обеспечение.">
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="text-3xl sm:text-4xl font-bold mb-4">Наши услуги</h1>
+        <p class="text-lg text-primary-100 max-w-2xl">
+          Полный комплекс решений для автоматизации торговли — от подбора оборудования до регистрации в ФНС
+        </p>
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service) => (
+            <ServiceCard
+              title={service.title}
+              description={service.description}
+              href={`/uslugi/${service.id}`}
+              icon={service.icon}
+              price={service.price || undefined}
+            />
+          ))}
+        </div>
+      </Container>
+    </section>
+
+    <section class="pb-16">
+      <Container>
+        <InlineLeadForm />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

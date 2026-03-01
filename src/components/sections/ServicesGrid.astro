@@ -1,0 +1,34 @@
+---
+import Container from '../ui/Container.astro';
+import ServiceCard from '../ui/ServiceCard.astro';
+
+const services = [
+  { title: 'Онлайн-кассы (ККТ)', description: 'Продажа и регистрация контрольно-кассовой техники всех ведущих производителей', href: '/uslugi/kkt', icon: '🖨️', price: 'от 12 900 ₽' },
+  { title: 'Фискальные накопители', description: 'ФН-1.1М на 15 и 36 месяцев для любой системы налогообложения', href: '/uslugi/fn', icon: '💾', price: 'от 7 500 ₽' },
+  { title: 'ОФД', description: 'Подключение к оператору фискальных данных. Передача чеков в ФНС онлайн', href: '/uslugi/ofd', icon: '📡', price: 'от 3 000 ₽/год' },
+  { title: 'Маркировка', description: 'Подключение к системе «Честный ЗНАК». Работа с маркированными товарами', href: '/uslugi/markirovka', icon: '🏷️' },
+  { title: 'ЕГАИС', description: 'Подключение и настройка для продажи алкогольной продукции', href: '/uslugi/egais', icon: '🍷' },
+  { title: 'ЭЦП', description: 'Электронная цифровая подпись для ФНС, торгов, ЕГАИС, маркировки', href: '/uslugi/ecp', icon: '🔐', price: 'от 1 500 ₽' },
+  { title: 'Рутокен', description: 'Носители ключей электронной подписи для безопасного хранения', href: '/uslugi/rutoken', icon: '🔑', price: 'от 1 500 ₽' },
+  { title: 'Торговое оборудование', description: 'Сканеры, принтеры чеков, принтеры этикеток, ТСД от ведущих брендов', href: '/uslugi/oborudovanie', icon: '📦' },
+  { title: 'Программное обеспечение', description: 'Кассовое ПО, товароучётные системы, 1С и совместимые решения', href: '/uslugi/programmy', icon: '💻' },
+  { title: 'Регистрация в ФНС', description: 'Постановка кассы на учёт в налоговой — онлайн, без очередей', href: '/uslugi/registratsiya-fns', icon: '📋', price: 'от 1 000 ₽' },
+];
+---
+
+<section class="section bg-white" id="services">
+  <Container>
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">Наши услуги</h2>
+      <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+        Полный комплекс решений для автоматизации торговли — от подбора оборудования до регистрации в ФНС
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      {services.map((service) => (
+        <ServiceCard {...service} />
+      ))}
+    </div>
+  </Container>
+</section>

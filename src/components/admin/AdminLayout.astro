@@ -1,0 +1,107 @@
+---
+import AdminSidebar from './AdminSidebar.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title} — Админка Вилит</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; }
+    .sidebar { width: 260px; background: #1e293b; color: #e2e8f0; min-height: 100vh; position: fixed; top: 0; left: 0; overflow-y: auto; }
+    .sidebar a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; color: #94a3b8; text-decoration: none; font-size: 0.875rem; transition: all 0.15s; border-left: 3px solid transparent; }
+    .sidebar a:hover, .sidebar a.active { color: #f8fafc; background: rgba(255,255,255,0.05); border-left-color: #3b82f6; }
+    .sidebar .logo { padding: 1.25rem; font-size: 1.25rem; font-weight: 700; color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar .section-label { padding: 1.25rem 1.25rem 0.5rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+    .main-content { margin-left: 260px; flex: 1; min-height: 100vh; }
+    .top-bar { background: white; border-bottom: 1px solid #e2e8f0; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .top-bar h1 { font-size: 1.25rem; font-weight: 600; }
+    .page-content { padding: 2rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; text-decoration: none; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: white; color: #374151; border-color: #d1d5db; }
+    .btn-secondary:hover { background: #f9fafb; }
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th { text-align: left; padding: 0.75rem 1rem; font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 0.75rem 1rem; font-size: 0.875rem; border-bottom: 1px solid #f1f5f9; }
+    tr:hover td { background: #f8fafc; }
+    .card { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-card { text-align: center; }
+    .stat-card .number { font-size: 2rem; font-weight: 700; color: #1e293b; }
+    .stat-card .label { font-size: 0.8125rem; color: #64748b; margin-top: 0.25rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.625rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; transition: border-color 0.15s; font-family: inherit; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+    .form-group .help { font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; }
+    .badge { display: inline-block; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+    .badge-new { background: #dbeafe; color: #1d4ed8; }
+    .badge-processing { background: #fef3c7; color: #92400e; }
+    .badge-done { background: #d1fae5; color: #065f46; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.25rem; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .actions { display: flex; gap: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mt-4 { margin-top: 1rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-muted { color: #94a3b8; }
+    .preview-box { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; min-height: 120px; background: white; }
+    .preview-box h1, .preview-box h2, .preview-box h3 { margin-top: 1rem; margin-bottom: 0.5rem; }
+    .preview-box p { margin-bottom: 0.5rem; }
+    .preview-box ul, .preview-box ol { padding-left: 1.5rem; margin-bottom: 0.5rem; }
+    .array-item { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .array-item input { flex: 1; }
+    .array-item button { padding: 0.375rem 0.5rem; background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; border-radius: 0.375rem; cursor: pointer; font-size: 0.8125rem; }
+    .kv-item { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .kv-item input { width: 100%; }
+    .faq-item { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem; }
+    .faq-item input, .faq-item textarea { width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: inherit; font-size: 0.875rem; }
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+      .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <AdminSidebar />
+  <div class="main-content">
+    <div class="top-bar">
+      <h1>{title}</h1>
+      <div class="actions">
+        <a href="/" class="btn btn-secondary btn-sm" target="_blank">Открыть сайт</a>
+        <button class="btn btn-secondary btn-sm" id="logout-btn">Выйти</button>
+      </div>
+    </div>
+    <div class="page-content">
+      <slot />
+    </div>
+  </div>
+  <script is:inline>
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      await fetch('/api/v1/auth/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    });
+  </script>
+</body>
+</html>

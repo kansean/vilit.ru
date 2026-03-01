@@ -1,0 +1,27 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import { blogRepo } from '../../lib/blog.repo';
+import { renderMarkdown } from '../../lib/markdown';
+import { safeJsonParse } from '../../lib/safe-json';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
+
+const row = blogRepo.getById(slug);
+if (!row) return Astro.redirect('/404');
+
+const contentHtml = renderMarkdown(row.content);
+---
+
+<BlogLayout
+  title={row.title}
+  description={row.description}
+  metaTitle={row.meta_title}
+  metaDescription={row.meta_description}
+  publishDate={new Date(row.publish_date)}
+  updatedDate={row.updated_date ? new Date(row.updated_date) : undefined}
+  author={row.author}
+  tags={safeJsonParse<string[]>(row.tags, [])}
+  slug={row.id}
+  contentHtml={contentHtml}
+/>

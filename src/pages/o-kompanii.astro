@@ -1,0 +1,67 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import TrustBar from '../components/sections/TrustBar.astro';
+import PartnersLogos from '../components/sections/PartnersLogos.astro';
+import InlineLeadForm from '../components/forms/InlineLeadForm.astro';
+import { buildBreadcrumbs } from '../utils/breadcrumbs';
+import { company } from '../data/company';
+
+const breadcrumbs = buildBreadcrumbs('/o-kompanii', 'О компании');
+---
+
+<PageLayout title="О компании" description="Компания «Вилит» — автоматизация розничной торговли с 2017 года. Поставка оборудования, подключение сервисов, техническая поддержка.">
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16 lg:py-24">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <div class="max-w-3xl">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">О компании «Вилит»</h1>
+          <p class="text-lg text-primary-100 leading-relaxed">
+            Мы помогаем малому и среднему бизнесу работать в соответствии с законодательством — быстро, просто и без лишних затрат.
+          </p>
+        </div>
+      </Container>
+    </section>
+
+    <TrustBar />
+
+    <section class="section">
+      <Container>
+        <div class="max-w-3xl prose">
+          <h2>Наша история</h2>
+          <p>
+            Компания «Вилит» работает на рынке автоматизации розничной торговли с {company.foundedYear} года. За это время мы помогли тысячам предпринимателей по всей России подключить онлайн-кассы, настроить ОФД, внедрить маркировку и ЕГАИС.
+          </p>
+
+          <h2>Что мы делаем</h2>
+          <p>
+            Мы не просто продаём оборудование — мы решаем задачи под ключ. Наши клиенты получают полный комплекс: от подбора кассы и фискального накопителя до регистрации в ФНС, подключения ОФД и обучения персонала.
+          </p>
+
+          <h2>Наши ценности</h2>
+          <ul>
+            <li><strong>Честность</strong> — мы подбираем решение, которое действительно нужно, а не самое дорогое</li>
+            <li><strong>Экспертиза</strong> — наши специалисты постоянно отслеживают изменения в законодательстве</li>
+            <li><strong>Скорость</strong> — от заявки до работающей кассы — 1-2 рабочих дня</li>
+            <li><strong>Поддержка</strong> — техническая помощь после покупки без дополнительных условий</li>
+          </ul>
+
+          <h2>Почему нам доверяют</h2>
+          <p>
+            Мы являемся официальными партнёрами ведущих производителей ККТ и операторов фискальных данных. Это гарантирует подлинность оборудования, актуальные цены и оперативную гарантийную поддержку.
+          </p>
+        </div>
+      </Container>
+    </section>
+
+    <PartnersLogos />
+
+    <section class="py-16">
+      <Container>
+        <InlineLeadForm title="Готовы начать? Свяжитесь с нами" />
+      </Container>
+    </section>
+  </main>
+</PageLayout>

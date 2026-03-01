@@ -1,0 +1,31 @@
+---
+import IndustryLayout from '../../layouts/IndustryLayout.astro';
+import { industriesRepo } from '../../lib/industries.repo';
+import { renderMarkdown } from '../../lib/markdown';
+import { safeJsonParse } from '../../lib/safe-json';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
+
+const row = industriesRepo.getById(slug);
+if (!row) return Astro.redirect('/404');
+
+const contentHtml = renderMarkdown(row.content);
+---
+
+<IndustryLayout
+  title={row.title}
+  description={row.description}
+  metaTitle={row.meta_title}
+  metaDescription={row.meta_description}
+  heroTitle={row.hero_title}
+  heroSubtitle={row.hero_subtitle}
+  icon={row.icon}
+  painPoints={safeJsonParse<string[]>(row.pain_points, [])}
+  legalRequirements={safeJsonParse<string[]>(row.legal_requirements, [])}
+  equipment={safeJsonParse<string[]>(row.equipment_list, [])}
+  faq={safeJsonParse<{question:string;answer:string}[]>(row.faq, [])}
+  slug={row.id}
+  relatedServices={safeJsonParse<string[]>(row.related_services, [])}
+  contentHtml={contentHtml}
+/>
