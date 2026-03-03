@@ -1,0 +1,33 @@
+---
+---
+
+<div id="cookie-consent" class="fixed bottom-0 left-0 right-0 z-50 hidden">
+  <div class="bg-neutral-900 text-white px-4 py-4 sm:px-6 shadow-[0_-4px_12px_rgba(0,0,0,0.15)]">
+    <div class="mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
+      <p class="text-sm text-neutral-300 flex-1">
+        Мы используем файлы cookie для улучшения работы сайта и анализа трафика. Продолжая использовать сайт, вы соглашаетесь с
+        <a href="/politika-konfidentsialnosti" class="underline text-white hover:text-primary-300 transition-colors">политикой конфиденциальности</a>.
+      </p>
+      <button
+        id="cookie-accept"
+        type="button"
+        class="shrink-0 bg-primary-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm"
+      >
+        Принять
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    if (localStorage.getItem('cookie_consent')) return;
+    var banner = document.getElementById('cookie-consent');
+    if (!banner) return;
+    banner.classList.remove('hidden');
+    document.getElementById('cookie-accept').addEventListener('click', function() {
+      localStorage.setItem('cookie_consent', '1');
+      banner.classList.add('hidden');
+    });
+  })();
+</script>

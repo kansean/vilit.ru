@@ -4,6 +4,7 @@ import SEOHead from '../components/seo/SEOHead.astro';
 import JsonLdOrganization from '../components/seo/JsonLdOrganization.astro';
 import type { SEOProps } from '../utils/seo';
 import { METRIKA_ID } from '../data/metrika';
+import CookieConsent from '../components/layout/CookieConsent.astro';
 
 interface Props extends SEOProps {}
 
@@ -38,5 +39,6 @@ const seoProps = Astro.props;
   </head>
   <body class="pb-16 sm:pb-0">
     <slot />
+    <CookieConsent />
   </body>
 </html>
