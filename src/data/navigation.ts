@@ -19,6 +19,7 @@ export const mainNavigation: NavItem[] = [
       { label: 'Оборудование', href: '/uslugi/oborudovanie' },
       { label: 'Программы', href: '/uslugi/programmy' },
       { label: 'Регистрация в ФНС', href: '/uslugi/registratsiya-fns' },
+      { label: 'Аренда онлайн-касс', href: '/uslugi/arenda-kkt' },
     ],
   },
   {
@@ -65,6 +66,7 @@ export const footerNavigation = {
       { label: 'ЕГАИС', href: '/uslugi/egais' },
       { label: 'ЭЦП', href: '/uslugi/ecp' },
       { label: 'Регистрация в ФНС', href: '/uslugi/registratsiya-fns' },
+      { label: 'Аренда касс', href: '/uslugi/arenda-kkt' },
     ],
   },
   industries: {
