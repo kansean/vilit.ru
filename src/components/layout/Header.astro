@@ -46,6 +46,21 @@ import { company } from '../../data/company';
         ))}
       </nav>
 
+      <!-- Search -->
+      <form action="/poisk" method="GET" class="hidden lg:flex items-center">
+        <div class="relative">
+          <input
+            type="search"
+            name="q"
+            placeholder="Поиск..."
+            class="w-40 xl:w-52 pl-8 pr-3 py-1.5 text-sm border border-neutral-200 rounded-lg bg-neutral-50 text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300"
+          />
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </form>
+
       <!-- Phone + CTA + Mobile toggle -->
       <div class="flex items-center gap-3">
         <a href={`tel:${company.phoneRaw}`} class="hidden md:block text-sm font-semibold text-neutral-800 hover:text-primary-600 transition-colors">
@@ -79,6 +94,20 @@ import { company } from '../../data/company';
   <div id="mobile-menu-backdrop" class="absolute inset-0 bg-black/50"></div>
   <div class="absolute right-0 top-0 h-full w-80 max-w-[calc(100vw-3rem)] bg-white shadow-xl overflow-y-auto">
     <div class="p-6 pt-20">
+      <!-- Mobile search -->
+      <form action="/poisk" method="GET" class="mb-4">
+        <div class="relative">
+          <input
+            type="search"
+            name="q"
+            placeholder="Поиск по сайту..."
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-neutral-200 rounded-lg bg-neutral-50 text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300"
+          />
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </form>
       <nav class="space-y-1">
         {mainNavigation.map((item) => (
           <div>

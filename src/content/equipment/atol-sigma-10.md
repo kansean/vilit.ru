@@ -3,7 +3,7 @@ title: "Касса АТОЛ SIGMA 10"
 description: "Смарт-касса АТОЛ SIGMA 10 с сенсорным 10-дюймовым экраном, встроенным принтером чеков и ФН в комплекте."
 metaTitle: "Касса АТОЛ SIGMA 10 — купить в Виллит"
 metaDescription: "Купить смарт-кассу АТОЛ SIGMA 10 с 10-дюймовым сенсорным экраном, встроенным принтером и ФН. Wi-Fi + Ethernet. Доставка по России."
-category: kassy
+category: smart-terminaly
 brand: "АТОЛ"
 model: "SIGMA 10"
 price: 27900

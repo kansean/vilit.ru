@@ -10,11 +10,13 @@ const segmentLabels: Record<string, string> = {
   'blog': 'Блог',
   'o-kompanii': 'О компании',
   'kontakty': 'Контакты',
+  'fiskalnye-registratory': 'Фискальные регистраторы',
+  'smart-terminaly': 'Смарт-терминалы',
   'skanery': 'Сканеры',
   'printery-chekov': 'Принтеры чеков',
   'printery-etiketok': 'Принтеры этикеток',
   'tsd': 'ТСД',
-  'kassy': 'Кассы',
+  'poisk': 'Поиск',
 };
 
 export function buildBreadcrumbs(path: string, currentTitle?: string): BreadcrumbItem[] {

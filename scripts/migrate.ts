@@ -152,6 +152,12 @@ function main() {
   db.pragma('journal_mode = WAL');
   db.exec(SCHEMA_SQL);
 
+  // Очистка таблиц перед миграцией
+  db.exec('DELETE FROM services');
+  db.exec('DELETE FROM industries');
+  db.exec('DELETE FROM equipment');
+  db.exec('DELETE FROM blog');
+
   // --- Services ---
   const services = readMdFiles(path.join(CONTENT_DIR, 'services'));
   const insertService = db.prepare(`

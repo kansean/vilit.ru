@@ -3,7 +3,7 @@ title: "Касса LiteBox 5 (MSPOS-K) б/у"
 description: "Мобильная онлайн-касса LiteBox 5 (MSPOS-K) бывшая в эксплуатации с предустановленным ПО LiteBox, принтером чеков и Wi-Fi."
 metaTitle: "Касса LiteBox 5 (MSPOS-K) б/у — купить в Вилит"
 metaDescription: "Купить б/у кассу LiteBox 5 (MSPOS-K) с предустановленным ПО LiteBox. Мобильная, с принтером чеков. Доставка по России."
-category: kassy
+category: smart-terminaly
 brand: "LiteBox"
 model: "5 (MSPOS-K)"
 price: 6500

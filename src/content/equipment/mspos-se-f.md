@@ -3,8 +3,8 @@ title: "Касса MSPOS-SE-Ф"
 description: "Мобильная касса MSPOS-SE-Ф со встроенным эквайрингом и фискальным накопителем. Для выездной торговли."
 metaTitle: "Касса MSPOS-SE-Ф — купить в Вилит"
 metaDescription: "Купить мобильную кассу MSPOS-SE-Ф со встроенным эквайрингом и ФН. Приём карт без терминала. Доставка по России."
-category: kassy
-brand: "МодульКасса"
+category: smart-terminaly
+brand: "Мультисофт"
 model: "MSPOS-SE-Ф"
 price: 19900
 image: "/images/equipment/mspos-se-f.jpg"

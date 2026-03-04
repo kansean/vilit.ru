@@ -80,4 +80,59 @@ export const equipmentRepo = {
     const rows = getDb().prepare('SELECT DISTINCT category FROM equipment ORDER BY category').all() as { category: string }[];
     return rows.map(r => r.category);
   },
+
+  listFiltered(filters: {
+    category?: string;
+    brands?: string[];
+    priceMin?: number;
+    priceMax?: number;
+    inStock?: boolean;
+  }): EquipmentRow[] {
+    const conditions: string[] = [];
+    const params: Record<string, unknown> = {};
+
+    if (filters.category) {
+      conditions.push('category = @category');
+      params.category = filters.category;
+    }
+    if (filters.brands && filters.brands.length > 0) {
+      const placeholders = filters.brands.map((_, i) => `@brand${i}`);
+      conditions.push(`brand IN (${placeholders.join(', ')})`);
+      filters.brands.forEach((b, i) => { params[`brand${i}`] = b; });
+    }
+    if (filters.priceMin != null) {
+      conditions.push('price >= @priceMin');
+      params.priceMin = filters.priceMin;
+    }
+    if (filters.priceMax != null) {
+      conditions.push('price <= @priceMax');
+      params.priceMax = filters.priceMax;
+    }
+    if (filters.inStock) {
+      conditions.push('in_stock = 1');
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    return getDb().prepare(`SELECT * FROM equipment ${where} ORDER BY sort_order ASC`).all(params) as EquipmentRow[];
+  },
+
+  brands(category?: string): string[] {
+    const sql = category
+      ? 'SELECT DISTINCT brand FROM equipment WHERE category = ? ORDER BY brand'
+      : 'SELECT DISTINCT brand FROM equipment ORDER BY brand';
+    const rows = category
+      ? getDb().prepare(sql).all(category) as { brand: string }[]
+      : getDb().prepare(sql).all() as { brand: string }[];
+    return rows.map(r => r.brand);
+  },
+
+  priceRange(category?: string): { min: number; max: number } {
+    const sql = category
+      ? 'SELECT MIN(price) as min, MAX(price) as max FROM equipment WHERE category = ?'
+      : 'SELECT MIN(price) as min, MAX(price) as max FROM equipment';
+    const row = category
+      ? getDb().prepare(sql).get(category) as { min: number; max: number }
+      : getDb().prepare(sql).get() as { min: number; max: number };
+    return { min: row.min || 0, max: row.max || 0 };
+  },
 };

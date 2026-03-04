@@ -2,6 +2,7 @@
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { equipmentRepo } from '../../../lib/equipment.repo';
 import { safeJsonParse } from '../../../lib/safe-json';
+import { equipmentCategories } from '../../../data/categories';
 
 const { id } = Astro.params;
 const isNew = id === 'new';
@@ -55,11 +56,9 @@ const formData = isNew ? {
           <div class="form-group">
             <label>Категория</label>
             <select x-model="form.category">
-              <option value="skanery">Сканеры</option>
-              <option value="printery-chekov">Принтеры чеков</option>
-              <option value="printery-etiketok">Принтеры этикеток</option>
-              <option value="tsd">ТСД</option>
-              <option value="kassy">Кассы</option>
+              {equipmentCategories.map((cat) => (
+                <option value={cat.slug}>{cat.label}</option>
+              ))}
             </select>
           </div>
           <div class="grid-2">

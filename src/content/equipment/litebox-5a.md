@@ -3,7 +3,7 @@ title: "Касса LiteBox 5A б/у"
 description: "Мобильная онлайн-касса LiteBox 5A бывшая в эксплуатации со встроенным эквайрингом и ПО LiteBox."
 metaTitle: "Касса LiteBox 5A б/у — купить в Вилит"
 metaDescription: "Купить б/у кассу LiteBox 5A со встроенным эквайрингом и ПО LiteBox. Мобильная, с принтером чеков. Доставка по России."
-category: kassy
+category: smart-terminaly
 brand: "LiteBox"
 model: "5A"
 price: 15900

@@ -1,16 +1,9 @@
 ---
 import AdminLayout from '../../../components/admin/AdminLayout.astro';
 import { equipmentRepo } from '../../../lib/equipment.repo';
+import { categoryLabelsShort } from '../../../data/categories';
 
 const equipment = equipmentRepo.list();
-
-const categoryLabels: Record<string, string> = {
-  'skanery': 'Сканеры',
-  'printery-chekov': 'Принтеры чеков',
-  'printery-etiketok': 'Принтеры этикеток',
-  'tsd': 'ТСД',
-  'kassy': 'Кассы',
-};
 ---
 
 <AdminLayout title="Оборудование">
@@ -36,7 +29,7 @@ const categoryLabels: Record<string, string> = {
             <strong>{e.title}</strong>
             <div class="text-sm text-muted">{e.brand} {e.model}</div>
           </td>
-          <td class="text-sm">{categoryLabels[e.category] || e.category}</td>
+          <td class="text-sm">{categoryLabelsShort[e.category] || e.category}</td>
           <td class="text-sm">{e.price.toLocaleString('ru-RU')} ₽</td>
           <td>
             <span class={`badge ${e.in_stock ? 'badge-done' : 'badge-processing'}`}>

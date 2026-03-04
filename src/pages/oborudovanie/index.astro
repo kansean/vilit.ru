@@ -6,17 +6,10 @@ import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import InlineLeadForm from '../../components/forms/InlineLeadForm.astro';
 import { buildBreadcrumbs } from '../../utils/breadcrumbs';
 import { equipmentRepo } from '../../lib/equipment.repo';
+import { equipmentCategories } from '../../data/categories';
 
 const allEquipment = equipmentRepo.list();
 const breadcrumbs = buildBreadcrumbs('/oborudovanie', 'Оборудование');
-
-const categories = [
-  { slug: 'skanery', label: 'Сканеры штрихкодов' },
-  { slug: 'printery-chekov', label: 'Принтеры чеков' },
-  { slug: 'printery-etiketok', label: 'Принтеры этикеток' },
-  { slug: 'tsd', label: 'Терминалы сбора данных (ТСД)' },
-  { slug: 'kassy', label: 'Кассы' },
-];
 ---
 
 <PageLayout title="Торговое оборудование" description="Сканеры, принтеры чеков, принтеры этикеток, ТСД и кассы для розничной торговли. Каталог оборудования от ведущих производителей.">
@@ -31,7 +24,7 @@ const categories = [
       </Container>
     </section>
 
-    {categories.map((cat) => {
+    {equipmentCategories.map((cat) => {
       const items = allEquipment.filter((e) => e.category === cat.slug);
       if (items.length === 0) return null;
       return (

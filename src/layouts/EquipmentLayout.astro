@@ -6,6 +6,7 @@ import InlineLeadForm from '../components/forms/InlineLeadForm.astro';
 import JsonLdProduct from '../components/seo/JsonLdProduct.astro';
 import { buildBreadcrumbs } from '../utils/breadcrumbs';
 import { formatPrice } from '../utils/formatters';
+import { categoryLabelsShort } from '../data/categories';
 
 interface Props {
   title: string;
@@ -30,14 +31,6 @@ const {
   category, brand, model, price, oldPrice, image,
   inStock = true, features, specs, slug, contentHtml,
 } = Astro.props;
-
-const categoryLabels: Record<string, string> = {
-  'skanery': 'Сканеры',
-  'printery-chekov': 'Принтеры чеков',
-  'printery-etiketok': 'Принтеры этикеток',
-  'tsd': 'ТСД',
-  'kassy': 'Кассы',
-};
 
 const breadcrumbs = buildBreadcrumbs(`/oborudovanie/${category}/${slug}`, title);
 ---

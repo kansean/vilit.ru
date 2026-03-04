@@ -6,22 +6,7 @@ import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
 import InlineLeadForm from '../../../components/forms/InlineLeadForm.astro';
 import { buildBreadcrumbs } from '../../../utils/breadcrumbs';
 import { equipmentRepo } from '../../../lib/equipment.repo';
-
-const categoryLabels: Record<string, string> = {
-  'skanery': 'Сканеры штрихкодов',
-  'printery-chekov': 'Принтеры чеков',
-  'printery-etiketok': 'Принтеры этикеток',
-  'tsd': 'Терминалы сбора данных (ТСД)',
-  'kassy': 'Кассы',
-};
-
-const categoryDescriptions: Record<string, string> = {
-  'skanery': 'Проводные и беспроводные сканеры штрихкодов 1D и 2D для розницы, складов и маркировки.',
-  'printery-chekov': 'Термопринтеры чеков для онлайн-касс и POS-систем.',
-  'printery-etiketok': 'Принтеры этикеток для маркировки, складского учёта и ценников.',
-  'tsd': 'Терминалы сбора данных для инвентаризации, приёмки товара и маркировки.',
-  'kassy': 'Онлайн-кассы и POS-системы для розничной торговли и общепита.',
-};
+import { categoryLabels, categoryDescriptions } from '../../../data/categories';
 
 const { category } = Astro.params;
 
@@ -33,10 +18,31 @@ const label = categoryLabels[category];
 const desc = categoryDescriptions[category] || '';
 const breadcrumbs = buildBreadcrumbs(`/oborudovanie/${category}`, label);
 
-const items = equipmentRepo.listByCategory(category);
+// Фильтры из query params
+const url = Astro.url;
+const selectedBrands = url.searchParams.getAll('brand');
+const priceMin = url.searchParams.get('price_min') ? Number(url.searchParams.get('price_min')) : undefined;
+const priceMax = url.searchParams.get('price_max') ? Number(url.searchParams.get('price_max')) : undefined;
+const inStockOnly = url.searchParams.get('in_stock') === '1';
+
+const hasFilters = selectedBrands.length > 0 || priceMin != null || priceMax != null || inStockOnly;
+
+const items = hasFilters
+  ? equipmentRepo.listFiltered({
+      category,
+      brands: selectedBrands.length > 0 ? selectedBrands : undefined,
+      priceMin,
+      priceMax,
+      inStock: inStockOnly || undefined,
+    })
+  : equipmentRepo.listByCategory(category);
+
+const allBrands = equipmentRepo.brands(category);
+const priceRange = equipmentRepo.priceRange(category);
+const canonicalUrl = `/oborudovanie/${category}`;
 ---
 
-<PageLayout title={label} description={desc}>
+<PageLayout title={label} description={desc} canonical={canonicalUrl}>
   <main>
     <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
       <Container>
@@ -48,26 +54,122 @@ const items = equipmentRepo.listByCategory(category);
 
     <section class="section">
       <Container>
-        {items.length > 0 ? (
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {items.map((item) => (
-              <EquipmentCard
-                title={item.title}
-                brand={item.brand}
-                price={item.price}
-                oldPrice={item.old_price || undefined}
-                href={`/oborudovanie/${item.category}/${item.id}`}
-                image={item.image || undefined}
-                inStock={!!item.in_stock}
-              />
-            ))}
+        <div class="lg:flex lg:gap-8">
+          <!-- Фильтры (sidebar) -->
+          {allBrands.length > 1 && (
+            <aside class="lg:w-64 shrink-0 mb-8 lg:mb-0">
+              <form method="GET" action={`/oborudovanie/${category}`} class="bg-neutral-50 rounded-xl p-5 space-y-5">
+                <h2 class="text-sm font-bold text-neutral-900 uppercase tracking-wide">Фильтры</h2>
+
+                <!-- Бренд -->
+                <div>
+                  <h3 class="text-sm font-semibold text-neutral-700 mb-2">Бренд</h3>
+                  <div class="space-y-1.5">
+                    {allBrands.map((brand) => (
+                      <label class="flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="brand"
+                          value={brand}
+                          checked={selectedBrands.includes(brand)}
+                          class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        {brand}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <!-- Цена -->
+                <div>
+                  <h3 class="text-sm font-semibold text-neutral-700 mb-2">Цена, ₽</h3>
+                  <div class="flex gap-2">
+                    <input
+                      type="number"
+                      name="price_min"
+                      placeholder={`от ${priceRange.min.toLocaleString('ru-RU')}`}
+                      value={priceMin ?? ''}
+                      class="w-full px-2.5 py-1.5 text-sm border border-neutral-300 rounded-lg"
+                    />
+                    <input
+                      type="number"
+                      name="price_max"
+                      placeholder={`до ${priceRange.max.toLocaleString('ru-RU')}`}
+                      value={priceMax ?? ''}
+                      class="w-full px-2.5 py-1.5 text-sm border border-neutral-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+
+                <!-- Наличие -->
+                <label class="flex items-center gap-2 text-sm text-neutral-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="in_stock"
+                    value="1"
+                    checked={inStockOnly}
+                    class="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  Только в наличии
+                </label>
+
+                <button
+                  type="submit"
+                  class="w-full bg-primary-600 text-white text-sm font-semibold py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Показать
+                </button>
+
+                {hasFilters && (
+                  <a
+                    href={`/oborudovanie/${category}`}
+                    class="block text-center text-sm text-primary-600 hover:text-primary-700"
+                  >
+                    Сбросить фильтры
+                  </a>
+                )}
+              </form>
+            </aside>
+          )}
+
+          <!-- Товары -->
+          <div class="flex-1">
+            {items.length > 0 ? (
+              <>
+                {hasFilters && (
+                  <p class="text-sm text-neutral-500 mb-4">Найдено: {items.length}</p>
+                )}
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                  {items.map((item) => (
+                    <EquipmentCard
+                      title={item.title}
+                      brand={item.brand}
+                      price={item.price}
+                      oldPrice={item.old_price || undefined}
+                      href={`/oborudovanie/${item.category}/${item.id}`}
+                      image={item.image || undefined}
+                      inStock={!!item.in_stock}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div class="text-center py-12">
+                {hasFilters ? (
+                  <>
+                    <p class="text-neutral-500 text-lg">По выбранным фильтрам ничего не найдено</p>
+                    <a href={`/oborudovanie/${category}`} class="text-primary-600 font-medium mt-4 inline-block">Сбросить фильтры</a>
+                  </>
+                ) : (
+                  <>
+                    <p class="text-neutral-500 text-lg">Каталог в этой категории скоро будет пополнен</p>
+                    <a href="/oborudovanie" class="text-primary-600 font-medium mt-4 inline-block">← Все категории</a>
+                  </>
+                )}
+              </div>
+            )}
           </div>
-        ) : (
-          <div class="text-center py-12">
-            <p class="text-neutral-500 text-lg">Каталог в этой категории скоро будет пополнен</p>
-            <a href="/oborudovanie" class="text-primary-600 font-medium mt-4 inline-block">← Все категории</a>
-          </div>
-        )}
+        </div>
       </Container>
     </section>
 

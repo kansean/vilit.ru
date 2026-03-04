@@ -1,0 +1,88 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '../utils/breadcrumbs';
+import { siteSearch } from '../lib/search';
+
+const query = Astro.url.searchParams.get('q')?.trim() || '';
+const results = query ? siteSearch(query) : [];
+const breadcrumbs = buildBreadcrumbs('/poisk', 'Поиск');
+
+const typeLabels: Record<string, string> = {
+  equipment: 'Оборудование',
+  service: 'Услуга',
+  blog: 'Блог',
+};
+
+const typeBadgeColors: Record<string, string> = {
+  equipment: 'bg-blue-100 text-blue-700',
+  service: 'bg-green-100 text-green-700',
+  blog: 'bg-purple-100 text-purple-700',
+};
+---
+
+<PageLayout title={query ? `Поиск: ${query}` : 'Поиск по сайту'} description="Поиск по каталогу оборудования, услугам и блогу vilit.ru">
+  <main>
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-16">
+      <Container>
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="text-3xl sm:text-4xl font-bold mb-6">Поиск по сайту</h1>
+        <form method="GET" action="/poisk" class="max-w-xl">
+          <div class="flex gap-2">
+            <input
+              type="search"
+              name="q"
+              value={query}
+              placeholder="Введите название товара, услуги..."
+              class="flex-1 px-4 py-3 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300"
+              autofocus
+            />
+            <button
+              type="submit"
+              class="px-6 py-3 bg-white text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-colors"
+            >
+              Найти
+            </button>
+          </div>
+        </form>
+      </Container>
+    </section>
+
+    <section class="section">
+      <Container>
+        {query && (
+          <p class="text-sm text-neutral-500 mb-6">
+            {results.length > 0
+              ? `Найдено результатов: ${results.length}`
+              : `По запросу «${query}» ничего не найдено`}
+          </p>
+        )}
+
+        {results.length > 0 && (
+          <div class="space-y-4 max-w-3xl">
+            {results.map((r) => (
+              <a
+                href={r.url}
+                class="block p-5 bg-white border border-neutral-200 rounded-xl hover:border-primary-300 hover:shadow-sm transition-all"
+              >
+                <div class="flex items-center gap-2 mb-1">
+                  <span class={`text-xs font-medium px-2 py-0.5 rounded-full ${typeBadgeColors[r.type]}`}>
+                    {typeLabels[r.type]}
+                  </span>
+                  {r.extra && <span class="text-xs text-neutral-400">{r.extra}</span>}
+                </div>
+                <h2 class="text-lg font-semibold text-neutral-900">{r.title}</h2>
+                <p class="text-sm text-neutral-600 mt-1 line-clamp-2">{r.description}</p>
+              </a>
+            ))}
+          </div>
+        )}
+
+        {!query && (
+          <p class="text-neutral-500">Введите запрос для поиска по каталогу оборудования, услугам и статьям блога.</p>
+        )}
+      </Container>
+    </section>
+  </main>
+</PageLayout>

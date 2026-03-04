@@ -3,7 +3,7 @@ title: "Касса НЕВА-01-Ф (LiteBox 7) б/у"
 description: "Смарт-терминал НЕВА-01-Ф (LiteBox 7) бывший в эксплуатации с 7-дюймовым экраном, ПО LiteBox и Ethernet."
 metaTitle: "Касса НЕВА-01-Ф (LiteBox 7) б/у — купить в Вилит"
 metaDescription: "Купить б/у кассу НЕВА-01-Ф (LiteBox 7) с 7-дюймовым экраном и ПО LiteBox. Ethernet + Wi-Fi. Доставка по России."
-category: kassy
+category: smart-terminaly
 brand: "LiteBox"
 model: "НЕВА-01-Ф (LiteBox 7)"
 price: 13700
