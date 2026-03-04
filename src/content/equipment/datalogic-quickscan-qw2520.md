@@ -7,6 +7,7 @@ category: skanery
 brand: "Datalogic"
 model: "QuickScan QW2520"
 price: 6490
+image: "/images/equipment/datalogic-qw2520.png"
 inStock: true
 features:
   - "1D/2D сканирование"

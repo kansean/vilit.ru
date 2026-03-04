@@ -7,6 +7,7 @@ category: printery-etiketok
 brand: "TSC"
 model: "TE200"
 price: 11900
+image: "/images/equipment/tsc-te200.png"
 oldPrice: 14500
 inStock: true
 features:

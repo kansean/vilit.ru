@@ -7,6 +7,7 @@ category: tsd
 brand: "Urovo"
 model: "DT50"
 price: 39900
+image: "/images/equipment/urovo-dt50.png"
 inStock: true
 features:
   - "Android 11"

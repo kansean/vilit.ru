@@ -7,6 +7,7 @@ category: printery-chekov
 brand: "АТОЛ"
 model: "RP-326"
 price: 8900
+image: "/images/equipment/atol-rp-326.jpg"
 inStock: true
 features:
   - "Скорость 250 мм/с"

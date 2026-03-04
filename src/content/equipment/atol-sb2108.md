@@ -6,7 +6,8 @@ metaDescription: "Купить сканер штрихкодов АТОЛ SB2108
 category: skanery
 brand: "АТОЛ"
 model: "SB2108"
-price: 3990
+price: 4200
+image: "/images/equipment/atol-sb2108.jpg"
 inStock: true
 features:
   - "1D/2D сканирование"

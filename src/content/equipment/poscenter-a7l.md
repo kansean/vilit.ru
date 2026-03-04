@@ -7,6 +7,7 @@ category: kassy
 brand: "POScenter"
 model: "A7L"
 price: 24900
+image: "/images/equipment/poscenter-a7l.jpg"
 inStock: true
 features:
   - "Android"

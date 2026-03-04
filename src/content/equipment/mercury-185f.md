@@ -7,6 +7,7 @@ category: kassy
 brand: "Инкотекс"
 model: "Меркурий 185Ф"
 price: 14900
+image: "/images/equipment/mercury-185f.jpg"
 inStock: true
 features:
   - "Автономная работа"

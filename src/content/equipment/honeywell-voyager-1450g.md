@@ -7,6 +7,7 @@ category: skanery
 brand: "Honeywell"
 model: "Voyager 1450g"
 price: 7490
+image: "/images/equipment/honeywell-1450g.png"
 inStock: true
 features:
   - "1D/2D сканирование"

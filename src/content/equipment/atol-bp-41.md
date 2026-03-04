@@ -7,6 +7,7 @@ category: skanery
 brand: "АТОЛ"
 model: "BP41"
 price: 5990
+image: "/images/equipment/atol-bp-41.png"
 inStock: true
 features:
   - "Беспроводной (Bluetooth)"

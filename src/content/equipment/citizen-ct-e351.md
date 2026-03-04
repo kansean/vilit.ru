@@ -6,7 +6,8 @@ metaDescription: "Купить принтер чеков Citizen CT-E351 с USB 
 category: printery-chekov
 brand: "Citizen"
 model: "CT-E351"
-price: 12500
+price: 15500
+image: "/images/equipment/citizen-ct-e351.jpg"
 inStock: true
 features:
   - "Компактный"

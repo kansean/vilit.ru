@@ -6,7 +6,8 @@ metaDescription: "Купить принтер этикеток Godex GE300 с US
 category: printery-etiketok
 brand: "Godex"
 model: "GE300"
-price: 15900
+price: 17900
+image: "/images/equipment/godex-ge300.png"
 inStock: true
 features:
   - "Разрешение 203 dpi"

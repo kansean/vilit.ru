@@ -7,6 +7,7 @@ category: skanery
 brand: "Mertech"
 model: "2310"
 price: 5490
+image: "/images/equipment/mertech-2310.jpg"
 inStock: true
 features:
   - "2D сканер"
